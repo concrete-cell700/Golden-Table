@@ -1,1 +1,12 @@
 
+{
+  "plugins": [
+    {
+      "id": "builder",
+      "name": "🎨 Билдер",
+      "description": "Создавай свои кнопки, панели, картинки. Перетаскивай, сохраняй.",
+      "url": "https://concrete-cell700.github.io/Golden-Table/plugins/builder.js",
+      "version": "1.0"
+    }
+  ]
+}
