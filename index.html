@@ -48,7 +48,6 @@
   }
   #app{ min-height:100%; display:flex; flex-direction:column; }
 
-  /* ---------- HEADER ---------- */
   header{
     display:flex; align-items:center; justify-content:space-between;
     padding:14px 18px;
@@ -95,7 +94,6 @@
   }
   .lang-btn.active{ background:var(--gold); color:#2a1e05; }
 
-  /* ---------- LOBBY ---------- */
   main{ flex:1; width:100%; max-width:640px; margin:0 auto; padding:18px; }
   .lobby-title{
     font-family:var(--serif); font-size:22px; color:var(--cream); text-align:center;
@@ -123,7 +121,6 @@
   .table-info p{ margin:0; font-size:12.5px; color:var(--cream-dim); line-height:1.4; }
   .table-go{ margin-left:auto; color:var(--gold); font-size:20px; }
 
-  /* ---------- GAME SCREENS shared ---------- */
   .game-screen{ display:none; }
   .game-screen.active{ display:block; animation:fadein .25s ease; }
   @keyframes fadein{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
@@ -183,7 +180,6 @@
     margin-top:10px; font-family:var(--serif);
   }
 
-  /* ---------- SLOTS ---------- */
   .reels{
     display:flex; gap:8px; justify-content:center;
     background:var(--panel); border-radius:12px; padding:14px;
@@ -199,7 +195,6 @@
   @keyframes spinblur{ 0%{filter:blur(0px);} 50%{filter:blur(3px);} 100%{filter:blur(0px);} }
   .paytable{ margin-top:14px; font-size:11.5px; color:var(--cream-dim); text-align:center; line-height:1.7; }
 
-  /* ---------- ROULETTE ---------- */
   .wheel-wrap{ display:flex; justify-content:center; margin-bottom:6px; position:relative; }
   .wheel-pointer{
     position:absolute; top:-4px; left:50%; transform:translateX(-50%);
@@ -243,7 +238,6 @@
   }
   .outside-bet.selected{ outline:2px solid var(--gold-light); background:#1a3a28; }
 
-  /* ---------- BLACKJACK ---------- */
   .dealer-area, .player-area{ margin-bottom:10px; }
   .hand-label{ font-size:12px; color:var(--cream-dim); margin-bottom:6px; display:flex; justify-content:space-between; }
   .hand-label b{ color:var(--gold-light); }
@@ -263,7 +257,6 @@
   }
   .divider{ height:1px; background:var(--gold-dim); opacity:.4; margin:14px 0; }
 
-  /* ---------- CLICKER ---------- */
   #coinBtn{
     width:150px; height:150px; border-radius:50%; border:4px solid var(--gold);
     background: radial-gradient(circle at 35% 30%, var(--gold-light), var(--gold) 55%, var(--gold-dim) 100%);
@@ -329,6 +322,69 @@
   }
 
   footer{ text-align:center; padding:14px; color:var(--cream-dim); font-size:11px; opacity:.6; }
+
+  /* ============ DEVTOOLS ============ */
+  #__dt_btn{
+    position:fixed; top:70px; right:10px; z-index:99999;
+    width:46px; height:46px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#f2cf7e,#8a6f2a);
+    border:2px solid #d4af37; color:#2a1e05;
+    font-size:22px; font-weight:bold; cursor:pointer;
+    box-shadow:0 4px 12px rgba(0,0,0,.6);
+  }
+  #__dt_panel{
+    position:fixed; top:0; right:0; width:92%; max-width:420px; height:100%;
+    background:#0a1712; border-left:1px solid #d4af37; z-index:99998;
+    display:none; flex-direction:column; font-family:monospace; color:#ece2c8;
+    box-shadow:-6px 0 20px rgba(0,0,0,.7);
+  }
+  #__dt_panel.open{ display:flex; }
+  #__dt_head{
+    padding:12px; background:#0d1f17; border-bottom:1px solid #d4af37;
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:Georgia,serif; color:#f2cf7e;
+  }
+  #__dt_head b{ font-size:15px; }
+  #__dt_close{ background:none; border:none; color:#d9534a; font-size:22px; cursor:pointer; }
+  #__dt_tabs{ display:flex; background:#0d1f17; border-bottom:1px solid #8a6f2a; }
+  .__dt_tab{
+    flex:1; padding:9px 4px; text-align:center; font-size:11px;
+    cursor:pointer; color:#b7ac93; border-bottom:2px solid transparent;
+  }
+  .__dt_tab.active{ color:#f2cf7e; border-bottom-color:#d4af37; }
+  #__dt_body{ flex:1; overflow-y:auto; padding:10px; }
+  .__dt_section{ margin-bottom:14px; }
+  .__dt_section>h4{
+    margin:0 0 6px; font-size:12px; color:#f2cf7e; font-family:Georgia,serif;
+    border-bottom:1px dashed #8a6f2a; padding-bottom:4px;
+  }
+  .__dt_row{
+    display:flex; align-items:center; gap:6px; padding:5px 6px;
+    background:#0d1f17; border:1px solid #1e3a2a; border-radius:6px;
+    margin-bottom:4px; font-size:11px;
+  }
+  .__dt_row .k{ flex:0 0 42%; color:#b7ac93; word-break:break-all; }
+  .__dt_row .v{ flex:1; color:#f2cf7e; font-weight:bold; word-break:break-all; }
+  .__dt_row button{
+    background:#1a3a28; border:1px solid #d4af37; color:#f2cf7e;
+    border-radius:5px; padding:3px 7px; font-size:10px; cursor:pointer;
+  }
+  .__dt_row button:hover{ background:#d4af37; color:#2a1e05; }
+  .__dt_row button.danger{ background:#3a1a1a; border-color:#b8342a; color:#d9534a; }
+  #__dt_console{
+    width:100%; background:#000; color:#0f0; border:1px solid #d4af37;
+    border-radius:6px; padding:8px; font-family:monospace; font-size:12px;
+    min-height:90px; resize:vertical; box-sizing:border-box;
+  }
+  .__dt_quick{ display:flex; flex-wrap:wrap; gap:6px; }
+  .__dt_quick button{
+    flex:1; min-width:90px; padding:8px 6px;
+    background:linear-gradient(180deg,#f2cf7e,#d4af37);
+    border:none; border-radius:6px; color:#2a1e05;
+    font-weight:bold; font-size:11px; cursor:pointer;
+  }
+  .__dt_quick button.danger{ background:linear-gradient(180deg,#d9534a,#b8342a); color:#ece2c8; }
+  .__dt_quick button.dark{ background:#1b1b1b; color:#ece2c8; border:1px solid #8a6f2a; }
 </style>
 </head>
 <body>
@@ -492,7 +548,6 @@
       </div>
     </div>
 
-
     <!-- CLICKER -->
     <div id="screen-clicker" class="game-screen">
       <div class="topbar">
@@ -539,209 +594,92 @@
 (function(){
   "use strict";
 
-  /* ---------- I18N ---------- */
   var translations = {
     ru: {
-      brandName: "Золотой Стол",
-      brandSub: "МИНИ-КАЗИНО",
-      footer: "Игра ведётся на виртуальные фишки. Реальные деньги не используются.",
-      lobbyTitle: "Выберите стол",
-      lobbySub: "Три игры, одна касса. Удачи за столом.",
-      slotsName: "Слоты",
-      slotsDesc: "Три барабана, шесть символов. Соберите комбинацию — сорвите куш.",
-      rouletteName: "Рулетка",
-      rouletteDesc: "Европейское колесо. Ставьте на число, цвет или чёт-нечет.",
-      blackjackName: "Блэкджек",
-      blackjackDesc: "Наберите 21 и обыграйте дилера. Классика карточного стола.",
-      backBtn: "← Лобби",
-      betLabel: "Ставка:",
-      selectedLabel: "Выбрано:",
-      noneSelected: "—",
-      spinBtn: "Крутить",
-      spinWheelBtn: "Крутить колесо",
-      dealBtn: "Сдать карты",
-      hitBtn: "Ещё карту",
-      standBtn: "Хватит",
-      doubleBtn: "Удвоить",
-      dealerLabel: "Дилер",
-      playerLabel: "Вы",
-
-      slotsDefault: "Выберите ставку и крутите барабаны",
-      slotsSpinning: "Барабаны крутятся…",
-      insufficient: "Недостаточно фишек для такой ставки",
-      slotsJackpot: "Джекпот! {sym}{sym}{sym}  Выигрыш: {win}",
-      slotsPair: "Пара! Выигрыш: {win}",
-      slotsLose: "Не повезло. Попробуйте ещё раз",
-      paytable: "7️⃣7️⃣7️⃣ × 20  |  💎💎💎 × 15  |  ⭐⭐⭐ × 10  |  🔔🔔🔔 × 8<br>🍋🍋🍋 × 5  |  🍒🍒🍒 × 3  |  любая пара × 1.5",
-
-      rouletteDefault: "Выберите число или тип ставки",
-      rouletteSpinning: "Колесо крутится…",
-      selNumber: "число {n}",
-      selRed: "красное",
-      selBlack: "чёрное",
-      selOdd: "нечёт",
-      selEven: "чёт",
-      outsideRed: "Красное ×2",
-      outsideBlack: "Чёрное ×2",
-      outsideOdd: "Нечёт ×2",
-      outsideEven: "Чёт ×2",
-      rouletteWin: "Выпало {n}! Выигрыш: {win}",
-      rouletteLose: "Выпало {n}. Ставка не сыграла",
-
-      bjDefault: "Сделайте ставку и сдайте карты",
-      bjYourTurn: "Ваш ход",
-      bjBust: "Перебор. Вы проиграли",
-      bjBustDouble: "Перебор после удвоения. Вы проиграли",
-      bjBlackjack: "Блэкджек! Выигрыш: {win}",
-      bjDealerBJ: "У дилера блэкджек. Вы проиграли",
-      bjDealerBust: "Дилер перебрал. Выигрыш: {win}",
-      bjWin: "Вы выиграли {win}",
-      bjPush: "Ничья. Ставка возвращена",
-      bjDealerWins: "Дилер сильнее. Вы проиграли",
-
-      outOfChips: "Фишки закончились. Получить ещё 1000 на кассе?",
-      clickerName: "Кликер",
-      clickerDesc: "Кликайте по монете — каждый клик приносит 0.1 коина.",
-      clickerEarned: "Всего заработано:",
-      clickerClicks: "Всего кликов:",
-      coinsLabel: "коинов",
-      levelLabel: "Уровень",
-      perSecLabel: "Доход в секунду:",
-      shopTitle: "Магазин улучшений",
-      achTitle: "Достижения",
-      buyBtn: "Купить",
-      maxedBtn: "Макс",
-      lvlShort: "ур.",
-      critFly: "КРИТ!",
-      achToast: "🏆 Достижение: {name}",
-      skinLocked: "Откроется на {lvl} уровне",
-      upPower: "Сила клика",
-      upPowerDesc: "+0.1 к каждому клику",
-      upGold: "Золотая монета",
-      upGoldDesc: "Удваивает силу клика",
-      upCrit: "Критический клик",
-      upCritDesc: "{p}% шанс на ×{m}",
-      bizKiosk: "Ларёк",
-      bizKioskDesc: "+0.1 коина/сек",
-      bizCafe: "Кафе",
-      bizCafeDesc: "+0.5 коина/сек",
-      bizCasino: "Филиал казино",
-      bizCasinoDesc: "+3 коина/сек",
-      aC100: "100 кликов",
-      aC1000: "1 000 кликов",
-      aC10k: "10 000 кликов",
-      aC100k: "100 000 кликов",
-      aC500k: "500 000 кликов",
-      aC1m: "1 000 000 кликов!",
-      aE500: "Заработать 500 коинов",
-      aE5k: "Заработать 5 000 коинов",
-      aE50k: "Заработать 50 000 коинов",
-      aLvl5: "Достичь 5 уровня",
-      aLvl10: "Достичь 10 уровня",
-      aFirstUp: "Первая покупка",
-      aCrit: "Критический удар",
-      aBiz: "Бизнесмен",
+      brandName:"Золотой Стол", brandSub:"МИНИ-КАЗИНО",
+      footer:"Игра ведётся на виртуальные фишки. Реальные деньги не используются.",
+      lobbyTitle:"Выберите стол", lobbySub:"Три игры, одна касса. Удачи за столом.",
+      slotsName:"Слоты", slotsDesc:"Три барабана, шесть символов. Соберите комбинацию — сорвите куш.",
+      rouletteName:"Рулетка", rouletteDesc:"Европейское колесо. Ставьте на число, цвет или чёт-нечет.",
+      blackjackName:"Блэкджек", blackjackDesc:"Наберите 21 и обыграйте дилера. Классика карточного стола.",
+      clickerName:"Кликер", clickerDesc:"Кликайте по монете — каждый клик приносит 0.1 коина.",
+      backBtn:"← Лобби", betLabel:"Ставка:", selectedLabel:"Выбрано:", noneSelected:"—",
+      spinBtn:"Крутить", spinWheelBtn:"Крутить колесо", dealBtn:"Сдать карты",
+      hitBtn:"Ещё карту", standBtn:"Хватит", doubleBtn:"Удвоить",
+      dealerLabel:"Дилер", playerLabel:"Вы",
+      slotsDefault:"Выберите ставку и крутите барабаны", slotsSpinning:"Барабаны крутятся…",
+      insufficient:"Недостаточно фишек для такой ставки",
+      slotsJackpot:"Джекпот! {sym}{sym}{sym}  Выигрыш: {win}", slotsPair:"Пара! Выигрыш: {win}",
+      slotsLose:"Не повезло. Попробуйте ещё раз",
+      paytable:"7️⃣7️⃣7️⃣ × 20  |  💎💎💎 × 15  |  ⭐⭐⭐ × 10  |  🔔🔔🔔 × 8<br>🍋🍋🍋 × 5  |  🍒🍒🍒 × 3  |  любая пара × 1.5",
+      rouletteDefault:"Выберите число или тип ставки", rouletteSpinning:"Колесо крутится…",
+      selNumber:"число {n}", selRed:"красное", selBlack:"чёрное", selOdd:"нечёт", selEven:"чёт",
+      outsideRed:"Красное ×2", outsideBlack:"Чёрное ×2", outsideOdd:"Нечёт ×2", outsideEven:"Чёт ×2",
+      rouletteWin:"Выпало {n}! Выигрыш: {win}", rouletteLose:"Выпало {n}. Ставка не сыграла",
+      bjDefault:"Сделайте ставку и сдайте карты", bjYourTurn:"Ваш ход",
+      bjBust:"Перебор. Вы проиграли", bjBustDouble:"Перебор после удвоения. Вы проиграли",
+      bjBlackjack:"Блэкджек! Выигрыш: {win}", bjDealerBJ:"У дилера блэкджек. Вы проиграли",
+      bjDealerBust:"Дилер перебрал. Выигрыш: {win}", bjWin:"Вы выиграли {win}",
+      bjPush:"Ничья. Ставка возвращена", bjDealerWins:"Дилер сильнее. Вы проиграли",
+      outOfChips:"Фишки закончились. Получить ещё 1000 на кассе?",
+      clickerEarned:"Всего заработано:", clickerClicks:"Всего кликов:", coinsLabel:"коинов",
+      levelLabel:"Уровень", perSecLabel:"Доход в секунду:", shopTitle:"Магазин улучшений",
+      achTitle:"Достижения", buyBtn:"Купить", maxedBtn:"Макс", lvlShort:"ур.",
+      critFly:"КРИТ!", achToast:"🏆 Достижение: {name}", skinLocked:"Откроется на {lvl} уровне",
+      upPower:"Сила клика", upPowerDesc:"+0.1 к каждому клику",
+      upGold:"Золотая монета", upGoldDesc:"Удваивает силу клика",
+      upCrit:"Критический клик", upCritDesc:"{p}% шанс на ×{m}",
+      bizKiosk:"Ларёк", bizKioskDesc:"+0.1 коина/сек",
+      bizCafe:"Кафе", bizCafeDesc:"+0.5 коина/сек",
+      bizCasino:"Филиал казино", bizCasinoDesc:"+3 коина/сек",
+      aC100:"100 кликов", aC1000:"1 000 кликов", aC10k:"10 000 кликов",
+      aC100k:"100 000 кликов", aC500k:"500 000 кликов", aC1m:"1 000 000 кликов!",
+      aE500:"Заработать 500 коинов", aE5k:"Заработать 5 000 коинов",
+      aE50k:"Заработать 50 000 коинов", aLvl5:"Достичь 5 уровня", aLvl10:"Достичь 10 уровня",
+      aFirstUp:"Первая покупка", aCrit:"Критический удар", aBiz:"Бизнесмен"
     },
     en: {
-      brandName: "Golden Table",
-      brandSub: "MINI-CASINO",
-      footer: "Chips are virtual. No real money is used.",
-      lobbyTitle: "Choose a table",
-      lobbySub: "Three games, one cashier. Good luck at the table.",
-      slotsName: "Slots",
-      slotsDesc: "Three reels, six symbols. Line them up to hit the jackpot.",
-      rouletteName: "Roulette",
-      rouletteDesc: "European wheel. Bet on a number, a color, or odd/even.",
-      blackjackName: "Blackjack",
-      blackjackDesc: "Hit 21 and beat the dealer. The card-table classic.",
-      backBtn: "← Lobby",
-      betLabel: "Bet:",
-      selectedLabel: "Selected:",
-      noneSelected: "—",
-      spinBtn: "Spin",
-      spinWheelBtn: "Spin the wheel",
-      dealBtn: "Deal cards",
-      hitBtn: "Hit",
-      standBtn: "Stand",
-      doubleBtn: "Double",
-      dealerLabel: "Dealer",
-      playerLabel: "You",
-
-      slotsDefault: "Choose a bet and spin the reels",
-      slotsSpinning: "Reels are spinning…",
-      insufficient: "Not enough chips for that bet",
-      slotsJackpot: "Jackpot! {sym}{sym}{sym}  You win: {win}",
-      slotsPair: "Pair! You win: {win}",
-      slotsLose: "No luck. Try again",
-      paytable: "7️⃣7️⃣7️⃣ × 20  |  💎💎💎 × 15  |  ⭐⭐⭐ × 10  |  🔔🔔🔔 × 8<br>🍋🍋🍋 × 5  |  🍒🍒🍒 × 3  |  any pair × 1.5",
-
-      rouletteDefault: "Choose a number or a bet type",
-      rouletteSpinning: "The wheel is spinning…",
-      selNumber: "number {n}",
-      selRed: "red",
-      selBlack: "black",
-      selOdd: "odd",
-      selEven: "even",
-      outsideRed: "Red ×2",
-      outsideBlack: "Black ×2",
-      outsideOdd: "Odd ×2",
-      outsideEven: "Even ×2",
-      rouletteWin: "It landed on {n}! You win: {win}",
-      rouletteLose: "It landed on {n}. The bet didn't hit",
-
-      bjDefault: "Place a bet and deal the cards",
-      bjYourTurn: "Your turn",
-      bjBust: "Bust. You lose",
-      bjBustDouble: "Bust after doubling. You lose",
-      bjBlackjack: "Blackjack! You win: {win}",
-      bjDealerBJ: "Dealer has blackjack. You lose",
-      bjDealerBust: "Dealer busts. You win: {win}",
-      bjWin: "You win {win}",
-      bjPush: "Push. Bet returned",
-      bjDealerWins: "Dealer wins. You lose",
-
-      outOfChips: "Out of chips. Get 1000 more at the cashier?",
-      clickerName: "Clicker",
-      clickerDesc: "Tap the coin — each click earns 0.1 coins.",
-      clickerEarned: "Total earned:",
-      clickerClicks: "Total clicks:",
-      coinsLabel: "coins",
-      levelLabel: "Level",
-      perSecLabel: "Income per second:",
-      shopTitle: "Upgrade shop",
-      achTitle: "Achievements",
-      buyBtn: "Buy",
-      maxedBtn: "Max",
-      lvlShort: "lvl",
-      critFly: "CRIT!",
-      achToast: "🏆 Achievement: {name}",
-      skinLocked: "Unlocks at level {lvl}",
-      upPower: "Click power",
-      upPowerDesc: "+0.1 to every click",
-      upGold: "Golden coin",
-      upGoldDesc: "Doubles click power",
-      upCrit: "Critical click",
-      upCritDesc: "{p}% chance of ×{m}",
-      bizKiosk: "Kiosk",
-      bizKioskDesc: "+0.1 coins/sec",
-      bizCafe: "Cafe",
-      bizCafeDesc: "+0.5 coins/sec",
-      bizCasino: "Casino branch",
-      bizCasinoDesc: "+3 coins/sec",
-      aC100: "100 clicks",
-      aC1000: "1,000 clicks",
-      aC10k: "10,000 clicks",
-      aC100k: "100,000 clicks",
-      aC500k: "500,000 clicks",
-      aC1m: "1,000,000 clicks!",
-      aE500: "Earn 500 coins",
-      aE5k: "Earn 5,000 coins",
-      aE50k: "Earn 50,000 coins",
-      aLvl5: "Reach level 5",
-      aLvl10: "Reach level 10",
-      aFirstUp: "First purchase",
-      aCrit: "Critical hit",
-      aBiz: "Business owner",
+      brandName:"Golden Table", brandSub:"MINI-CASINO",
+      footer:"Chips are virtual. No real money is used.",
+      lobbyTitle:"Choose a table", lobbySub:"Three games, one cashier. Good luck at the table.",
+      slotsName:"Slots", slotsDesc:"Three reels, six symbols. Line them up to hit the jackpot.",
+      rouletteName:"Roulette", rouletteDesc:"European wheel. Bet on a number, a color, or odd/even.",
+      blackjackName:"Blackjack", blackjackDesc:"Hit 21 and beat the dealer. The card-table classic.",
+      clickerName:"Clicker", clickerDesc:"Tap the coin — each click earns 0.1 coins.",
+      backBtn:"← Lobby", betLabel:"Bet:", selectedLabel:"Selected:", noneSelected:"—",
+      spinBtn:"Spin", spinWheelBtn:"Spin the wheel", dealBtn:"Deal cards",
+      hitBtn:"Hit", standBtn:"Stand", doubleBtn:"Double",
+      dealerLabel:"Dealer", playerLabel:"You",
+      slotsDefault:"Choose a bet and spin the reels", slotsSpinning:"Reels are spinning…",
+      insufficient:"Not enough chips for that bet",
+      slotsJackpot:"Jackpot! {sym}{sym}{sym}  You win: {win}", slotsPair:"Pair! You win: {win}",
+      slotsLose:"No luck. Try again",
+      paytable:"7️⃣7️⃣7️⃣ × 20  |  💎💎💎 × 15  |  ⭐⭐⭐ × 10  |  🔔🔔🔔 × 8<br>🍋🍋🍋 × 5  |  🍒🍒🍒 × 3  |  any pair × 1.5",
+      rouletteDefault:"Choose a number or a bet type", rouletteSpinning:"The wheel is spinning…",
+      selNumber:"number {n}", selRed:"red", selBlack:"black", selOdd:"odd", selEven:"even",
+      outsideRed:"Red ×2", outsideBlack:"Black ×2", outsideOdd:"Odd ×2", outsideEven:"Even ×2",
+      rouletteWin:"It landed on {n}! You win: {win}", rouletteLose:"It landed on {n}. The bet didn't hit",
+      bjDefault:"Place a bet and deal the cards", bjYourTurn:"Your turn",
+      bjBust:"Bust. You lose", bjBustDouble:"Bust after doubling. You lose",
+      bjBlackjack:"Blackjack! You win: {win}", bjDealerBJ:"Dealer has blackjack. You lose",
+      bjDealerBust:"Dealer busts. You win: {win}", bjWin:"You win {win}",
+      bjPush:"Push. Bet returned", bjDealerWins:"Dealer wins. You lose",
+      outOfChips:"Out of chips. Get 1000 more at the cashier?",
+      clickerEarned:"Total earned:", clickerClicks:"Total clicks:", coinsLabel:"coins",
+      levelLabel:"Level", perSecLabel:"Income per second:", shopTitle:"Upgrade shop",
+      achTitle:"Achievements", buyBtn:"Buy", maxedBtn:"Max", lvlShort:"lvl",
+      critFly:"CRIT!", achToast:"🏆 Achievement: {name}", skinLocked:"Unlocks at level {lvl}",
+      upPower:"Click power", upPowerDesc:"+0.1 to every click",
+      upGold:"Golden coin", upGoldDesc:"Doubles click power",
+      upCrit:"Critical click", upCritDesc:"{p}% chance of ×{m}",
+      bizKiosk:"Kiosk", bizKioskDesc:"+0.1 coins/sec",
+      bizCafe:"Cafe", bizCafeDesc:"+0.5 coins/sec",
+      bizCasino:"Casino branch", bizCasinoDesc:"+3 coins/sec",
+      aC100:"100 clicks", aC1000:"1,000 clicks", aC10k:"10,000 clicks",
+      aC100k:"100,000 clicks", aC500k:"500,000 clicks", aC1m:"1,000,000 clicks!",
+      aE500:"Earn 500 coins", aE5k:"Earn 5,000 coins",
+      aE50k:"Earn 50,000 coins", aLvl5:"Reach level 5", aLvl10:"Reach level 10",
+      aFirstUp:"First purchase", aCrit:"Critical hit", aBiz:"Business owner"
     }
   };
 
@@ -751,15 +689,10 @@
 
   function t(key, params){
     var str = (translations[currentLang] && translations[currentLang][key]) || key;
-    if(params){
-      Object.keys(params).forEach(function(p){
-        str = str.split("{"+p+"}").join(params[p]);
-      });
-    }
+    if(params){ Object.keys(params).forEach(function(p){ str = str.split("{"+p+"}").join(params[p]); }); }
     return str;
   }
 
-  // per-screen message state, so switching language re-renders the live message correctly
   var msgState = {
     slots: { key: "slotsDefault", params: null },
     roulette: { key: "rouletteDefault", params: null },
@@ -772,21 +705,15 @@
 
   function applyStaticTranslations(){
     document.documentElement.lang = currentLang;
-    document.querySelectorAll("[data-i18n]").forEach(function(el){
-      el.innerHTML = t(el.dataset.i18n);
-    });
+    document.querySelectorAll("[data-i18n]").forEach(function(el){ el.innerHTML = t(el.dataset.i18n); });
     document.getElementById("paytableText").innerHTML = t("paytable");
     document.getElementById("slotsMsg").innerHTML = t(msgState.slots.key, msgState.slots.params);
     document.getElementById("rouletteMsg").innerHTML = t(msgState.roulette.key, msgState.roulette.params);
     document.getElementById("bjMsg").innerHTML = t(msgState.blackjack.key, msgState.blackjack.params);
     var sel = document.getElementById("rouletteSelDisplay");
-    if(sel && sel.dataset.selKey){
-      sel.textContent = t(sel.dataset.selKey, sel.dataset.selN ? {n: sel.dataset.selN} : null);
-    }
+    if(sel && sel.dataset.selKey){ sel.textContent = t(sel.dataset.selKey, sel.dataset.selN ? {n: sel.dataset.selN} : null); }
     if(typeof window.refreshClicker === "function"){ window.refreshClicker(); }
-    document.querySelectorAll(".lang-btn").forEach(function(btn){
-      btn.classList.toggle("active", btn.dataset.lang === currentLang);
-    });
+    document.querySelectorAll(".lang-btn").forEach(function(btn){ btn.classList.toggle("active", btn.dataset.lang === currentLang); });
   }
 
   document.querySelectorAll(".lang-btn").forEach(function(btn){
@@ -797,7 +724,6 @@
     });
   });
 
-  /* ---------- BALANCE ---------- */
   var balanceKey = "zolotoy_stol_balance";
   var balance = parseFloat(localStorage.getItem(balanceKey));
   if(isNaN(balance) || balance < 0) balance = 1000;
@@ -808,19 +734,12 @@
     balanceEl.textContent = balance.toLocaleString(currentLang === "ru" ? "ru-RU" : "en-US", {minimumFractionDigits: 1, maximumFractionDigits: 1});
     if(typeof window.refreshClickerShop === "function"){ window.refreshClickerShop(); }
     if(balance === 0){
-      setTimeout(function(){
-        if(confirm(t("outOfChips"))){
-          setBalance(1000);
-        }
-      }, 400);
+      setTimeout(function(){ if(confirm(t("outOfChips"))){ setBalance(1000); } }, 400);
     }
   }
 
-  /* ---------- NAVIGATION ---------- */
   var screens = document.querySelectorAll(".game-screen");
-  function showScreen(id){
-    screens.forEach(function(s){ s.classList.toggle("active", s.id === id); });
-  }
+  function showScreen(id){ screens.forEach(function(s){ s.classList.toggle("active", s.id === id); }); }
   document.querySelectorAll(".table-card").forEach(function(card){
     card.addEventListener("click", function(){ showScreen(card.dataset.target); });
   });
@@ -828,12 +747,10 @@
     btn.addEventListener("click", function(){ showScreen("lobby"); });
   });
 
-  /* =========================================================
-     SLOTS
-  ========================================================== */
+  /* SLOTS */
   (function(){
     var symbols = ["🍒","🍋","🔔","⭐","💎","7️⃣"];
-    var weights  = [30, 25, 18, 14, 9, 4]; // lower weight = rarer
+    var weights  = [30, 25, 18, 14, 9, 4];
     var payoutMultipliers = {"7️⃣":20, "💎":15, "⭐":10, "🔔":8, "🍋":5, "🍒":3};
     var bet = 10;
     var spinning = false;
@@ -867,12 +784,9 @@
       spinBtn.disabled = true;
       setBalance(balance - bet);
       setMsg("slots", msgEl, "slotsSpinning");
-
       reels.forEach(function(r){ r.classList.add("spin"); });
-
       var results = [weightedSymbol(), weightedSymbol(), weightedSymbol()];
       var delays = [900, 1300, 1700];
-
       reels.forEach(function(reel, i){
         var flickerTimer = setInterval(function(){
           reel.textContent = symbols[Math.floor(Math.random()*symbols.length)];
@@ -903,14 +817,12 @@
     }
   })();
 
-  /* =========================================================
-     ROULETTE
-  ========================================================== */
+  /* ROULETTE */
   (function(){
     var wheelOrder = [0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
     var redNumbers = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
     var bet = 10;
-    var selection = null; // {type:'number', value:7} or {type:'outside', value:'red'}
+    var selection = null;
     var spinning = false;
 
     var betDisplay = document.getElementById("rouletteBetDisplay");
@@ -928,7 +840,6 @@
       });
     });
 
-    // build number grid 1-36 in 3 rows like classic layout, plus 0
     var grid = document.getElementById("numberGrid");
     var zeroCell = document.createElement("div");
     zeroCell.className = "num-cell zero";
@@ -944,11 +855,8 @@
     }
 
     function clearSelectionUI(){
-      document.querySelectorAll(".num-cell.selected, .outside-bet.selected").forEach(function(el){
-        el.classList.remove("selected");
-      });
+      document.querySelectorAll(".num-cell.selected, .outside-bet.selected").forEach(function(el){ el.classList.remove("selected"); });
     }
-
     function setSelDisplay(key, n){
       selDisplay.dataset.selKey = key;
       if(n !== undefined){ selDisplay.dataset.selN = n; selDisplay.textContent = t(key, {n:n}); }
@@ -1029,20 +937,14 @@
         else if(selection.value === "odd" && isOdd) win = bet * 2;
         else if(selection.value === "even" && num!==0 && !isOdd) win = bet * 2;
       }
-      if(win > 0){
-        setBalance(balance + win);
-        setMsg("roulette", msgEl, "rouletteWin", {n:num, win:win});
-      } else {
-        setMsg("roulette", msgEl, "rouletteLose", {n:num});
-      }
+      if(win > 0){ setBalance(balance + win); setMsg("roulette", msgEl, "rouletteWin", {n:num, win:win}); }
+      else { setMsg("roulette", msgEl, "rouletteLose", {n:num}); }
       spinning = false;
       spinBtnR.disabled = false;
     }
   })();
 
-  /* =========================================================
-     BLACKJACK
-  ========================================================== */
+  /* BLACKJACK */
   (function(){
     var suits = [{s:"♠",c:"black"},{s:"♣",c:"black"},{s:"♥",c:"red"},{s:"♦",c:"red"}];
     var ranks = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
@@ -1071,9 +973,7 @@
 
     function freshDeck(){
       var d = [];
-      suits.forEach(function(su){
-        ranks.forEach(function(r){ d.push({r:r, s:su.s, c:su.c}); });
-      });
+      suits.forEach(function(su){ ranks.forEach(function(r){ d.push({r:r, s:su.s, c:su.c}); }); });
       for(var i=d.length-1;i>0;i--){
         var j = Math.floor(Math.random()*(i+1));
         var tmp = d[i]; d[i]=d[j]; d[j]=tmp;
@@ -1110,9 +1010,7 @@
           var back = document.createElement("div");
           back.className = "card back";
           dealerCardsEl.appendChild(back);
-        } else {
-          dealerCardsEl.appendChild(renderCard(c));
-        }
+        } else { dealerCardsEl.appendChild(renderCard(c)); }
       });
       playerScoreEl.textContent = handScore(playerHand);
       dealerScoreEl.textContent = hideDealerHole ? "?" : handScore(dealerHand);
@@ -1131,10 +1029,7 @@
       document.getElementById("doubleBtn").disabled = !canDouble;
       renderHands(true);
       setMsg("blackjack", msgEl, "bjYourTurn");
-
-      if(handScore(playerHand) === 21){
-        finishRound();
-      }
+      if(handScore(playerHand) === 21){ finishRound(); }
     }
 
     document.getElementById("dealBtn").addEventListener("click", startRound);
@@ -1145,10 +1040,7 @@
       canDouble = false;
       document.getElementById("doubleBtn").disabled = true;
       renderHands(true);
-      if(handScore(playerHand) > 21){
-        setMsg("blackjack", msgEl, "bjBust");
-        finishRound(true);
-      }
+      if(handScore(playerHand) > 21){ setMsg("blackjack", msgEl, "bjBust"); finishRound(true); }
     });
 
     document.getElementById("standBtn").addEventListener("click", function(){
@@ -1163,52 +1055,28 @@
       betDisplay.textContent = bet;
       playerHand.push(deck.pop());
       renderHands(true);
-      if(handScore(playerHand) > 21){
-        setMsg("blackjack", msgEl, "bjBustDouble");
-        finishRound(true);
-      } else {
-        finishRound();
-      }
+      if(handScore(playerHand) > 21){ setMsg("blackjack", msgEl, "bjBustDouble"); finishRound(true); }
+      else { finishRound(); }
     });
 
     function finishRound(playerBusted){
       inRound = false;
       var playerTotal = handScore(playerHand);
-
-      if(!playerBusted){
-        while(handScore(dealerHand) < 17){
-          dealerHand.push(deck.pop());
-        }
-      }
+      if(!playerBusted){ while(handScore(dealerHand) < 17){ dealerHand.push(deck.pop()); } }
       renderHands(false);
       var dealerTotal = handScore(dealerHand);
       var playerBJ = playerTotal === 21 && playerHand.length === 2;
       var dealerBJ = dealerTotal === 21 && dealerHand.length === 2;
-
       var win = 0, key = "", params = null;
-      if(playerBusted){
-        key = "bjBust";
-      } else if(playerBJ && !dealerBJ){
-        win = Math.round(bet * 2.5);
-        key = "bjBlackjack"; params = {win: win};
-      } else if(dealerBJ && !playerBJ){
-        key = "bjDealerBJ";
-      } else if(dealerTotal > 21){
-        win = bet * 2;
-        key = "bjDealerBust"; params = {win: win};
-      } else if(playerTotal > dealerTotal){
-        win = bet * 2;
-        key = "bjWin"; params = {win: win};
-      } else if(playerTotal === dealerTotal){
-        win = bet;
-        key = "bjPush";
-      } else {
-        key = "bjDealerWins";
-      }
-
+      if(playerBusted){ key = "bjBust"; }
+      else if(playerBJ && !dealerBJ){ win = Math.round(bet * 2.5); key = "bjBlackjack"; params = {win: win}; }
+      else if(dealerBJ && !playerBJ){ key = "bjDealerBJ"; }
+      else if(dealerTotal > 21){ win = bet * 2; key = "bjDealerBust"; params = {win: win}; }
+      else if(playerTotal > dealerTotal){ win = bet * 2; key = "bjWin"; params = {win: win}; }
+      else if(playerTotal === dealerTotal){ win = bet; key = "bjPush"; }
+      else { key = "bjDealerWins"; }
       if(win > 0) setBalance(balance + win);
       setMsg("blackjack", msgEl, key, params);
-
       actionPanel.style.display = "none";
       betPanel.style.display = "block";
       bet = 10;
@@ -1216,10 +1084,7 @@
     }
   })();
 
-
-  /* =========================================================
-     CLICKER
-  ========================================================== */
+  /* CLICKER */
   (function(){
     var SKEY = "zolotoy_stol_clicker";
     var state = null;
@@ -1238,12 +1103,9 @@
     state.bizOwned = state.bizOwned||0;
     function save(){ try{ localStorage.setItem(SKEY, JSON.stringify(state)); }catch(e){} }
 
-    var SKINS = [
-      {i:"🪙", lvl:1},{i:"🥈", lvl:3},{i:"💰", lvl:5},
-      {i:"👑", lvl:10},{i:"💎", lvl:20},{i:"🔥", lvl:50}
-    ];
+    var SKINS = [{i:"🪙",lvl:1},{i:"🥈",lvl:3},{i:"💰",lvl:5},{i:"👑",lvl:10},{i:"💎",lvl:20},{i:"🔥",lvl:50}];
     var UPGRADES = [
-      {id:"power", icon:"💪", nameKey:"upPower", descKey:"upPowerDesc", base:50,  growth:1.5, max:999},
+      {id:"power", icon:"💪", nameKey:"upPower", descKey:"upPowerDesc", base:50, growth:1.5, max:999},
       {id:"gold",  icon:"🥇", nameKey:"upGold",  descKey:"upGoldDesc",  base:200, growth:1,   max:1},
       {id:"crit",  icon:"⚡", nameKey:"upCrit",  descKey:"upCritDesc",  base:300, growth:2.2, max:3}
     ];
@@ -1255,28 +1117,26 @@
       {id:"casinoB", icon:"🏦", nameKey:"bizCasino", descKey:"bizCasinoDesc", base:2500, growth:1.7, rate:3}
     ];
     var ACH = [
-      {id:"c100",    icon:"🖱️", key:"aC100",  check:function(s){return s.totalClicks>=100;}},
-      {id:"c1000",   icon:"🖱️", key:"aC1000", check:function(s){return s.totalClicks>=1000;}},
-      {id:"c10000",  icon:"🖱️", key:"aC10k",  check:function(s){return s.totalClicks>=10000;}},
-      {id:"c100000", icon:"🖱️", key:"aC100k", check:function(s){return s.totalClicks>=100000;}},
-      {id:"c500000", icon:"🖱️", key:"aC500k", check:function(s){return s.totalClicks>=500000;}},
-      {id:"c1m",     icon:"🏆", key:"aC1m",   check:function(s){return s.totalClicks>=1000000;}},
-      {id:"e500",    icon:"💰", key:"aE500",  check:function(s){return s.totalEarned>=500;}},
-      {id:"e5k",     icon:"💰", key:"aE5k",   check:function(s){return s.totalEarned>=5000;}},
-      {id:"e50k",    icon:"💰", key:"aE50k",  check:function(s){return s.totalEarned>=50000;}},
-      {id:"lvl5",    icon:"⭐", key:"aLvl5",  check:function(s){return s.level>=5;}},
-      {id:"lvl10",   icon:"⭐", key:"aLvl10", check:function(s){return s.level>=10;}},
-      {id:"firstUp", icon:"🛒", key:"aFirstUp", check:function(s){return s.upgBought>=1;}},
-      {id:"crit",    icon:"⚡", key:"aCrit",  check:function(s){return s.critDone;}},
-      {id:"biz",     icon:"🏪", key:"aBiz",   check:function(s){return s.bizOwned>=1;}}
+      {id:"c100",icon:"🖱️",key:"aC100",check:function(s){return s.totalClicks>=100;}},
+      {id:"c1000",icon:"🖱️",key:"aC1000",check:function(s){return s.totalClicks>=1000;}},
+      {id:"c10000",icon:"🖱️",key:"aC10k",check:function(s){return s.totalClicks>=10000;}},
+      {id:"c100000",icon:"🖱️",key:"aC100k",check:function(s){return s.totalClicks>=100000;}},
+      {id:"c500000",icon:"🖱️",key:"aC500k",check:function(s){return s.totalClicks>=500000;}},
+      {id:"c1m",icon:"🏆",key:"aC1m",check:function(s){return s.totalClicks>=1000000;}},
+      {id:"e500",icon:"💰",key:"aE500",check:function(s){return s.totalEarned>=500;}},
+      {id:"e5k",icon:"💰",key:"aE5k",check:function(s){return s.totalEarned>=5000;}},
+      {id:"e50k",icon:"💰",key:"aE50k",check:function(s){return s.totalEarned>=50000;}},
+      {id:"lvl5",icon:"⭐",key:"aLvl5",check:function(s){return s.level>=5;}},
+      {id:"lvl10",icon:"⭐",key:"aLvl10",check:function(s){return s.level>=10;}},
+      {id:"firstUp",icon:"🛒",key:"aFirstUp",check:function(s){return s.upgBought>=1;}},
+      {id:"crit",icon:"⚡",key:"aCrit",check:function(s){return s.critDone;}},
+      {id:"biz",icon:"🏪",key:"aBiz",check:function(s){return s.bizOwned>=1;}}
     ];
 
     function upLevel(id){ return state.upgrades[id]||0; }
     function bizLevel(id){ return state.biz[id]||0; }
     function itemCost(item, lvl){ return Math.round(item.base * Math.pow(item.growth, lvl)); }
-    function clickValue(){
-      return (0.1 + 0.1 * upLevel("power")) * (upLevel("gold") > 0 ? 2 : 1);
-    }
+    function clickValue(){ return (0.1 + 0.1 * upLevel("power")) * (upLevel("gold") > 0 ? 2 : 1); }
     function critChance(){ return CRIT_CHANCES[Math.min(upLevel("crit"), CRIT_CHANCES.length-1)]; }
     function incomePerSec(){
       var s = 0;
@@ -1321,16 +1181,10 @@
         var b = document.createElement("button");
         b.className = "skin-btn";
         b.textContent = sk.i;
-        if(state.level < sk.lvl){
-          b.disabled = true;
-          b.title = t("skinLocked", {lvl: sk.lvl});
-        } else {
+        if(state.level < sk.lvl){ b.disabled = true; b.title = t("skinLocked", {lvl: sk.lvl}); }
+        else {
           if(state.skin === sk.i) b.classList.add("active");
-          b.addEventListener("click", function(){
-            state.skin = sk.i;
-            coinIcon.textContent = sk.i;
-            save(); renderSkins();
-          });
+          b.addEventListener("click", function(){ state.skin = sk.i; coinIcon.textContent = sk.i; save(); renderSkins(); });
         }
         row.appendChild(b);
       });
@@ -1343,15 +1197,11 @@
       var cost = maxed ? 0 : itemCost(item, lvl);
       var div = document.createElement("div");
       div.className = "shop-item";
-
       var params = null;
-      if(item.id === "crit" && !maxed){
-        params = {p: Math.round(CRIT_CHANCES[lvl+1] * 100), m: CRIT_MULT};
-      }
+      if(item.id === "crit" && !maxed){ params = {p: Math.round(CRIT_CHANCES[lvl+1] * 100), m: CRIT_MULT}; }
       var name = t(item.nameKey);
       if(kind === "up" && item.max > 1) name += " · " + t("lvlShort") + " " + lvl;
       if(kind === "biz" && lvl > 0) name += " · " + t("lvlShort") + " " + lvl;
-
       var btn = document.createElement("button");
       btn.className = "buy-btn";
       btn.innerHTML = maxed ? "✓ " + t("maxedBtn") : t("buyBtn") + " " + cost;
@@ -1363,16 +1213,13 @@
         else { state.biz[item.id] = lvl + 1; state.bizOwned++; }
         save(); renderShop(); updateStats(); checkAchievements();
       });
-
       var info = document.createElement("div");
       info.className = "info";
       var bEl = document.createElement("b"); bEl.textContent = name;
       var sEl = document.createElement("span"); sEl.innerHTML = t(item.descKey, params);
       info.appendChild(bEl); info.appendChild(sEl);
-
       var ic = document.createElement("div");
       ic.className = "ic"; ic.textContent = item.icon;
-
       div.appendChild(ic); div.appendChild(info); div.appendChild(btn);
       return div;
     }
@@ -1428,45 +1275,35 @@
         comboTag.textContent = "🔥 ×" + (Math.round(comboMult() * 100) / 100);
       }
       clearTimeout(comboHideTimer);
-      comboHideTimer = setTimeout(function(){
-        combo = 0;
-        comboTag.style.display = "none";
-      }, COMBO_WINDOW);
+      comboHideTimer = setTimeout(function(){ combo = 0; comboTag.style.display = "none"; }, COMBO_WINDOW);
     }
 
     function doClick(){
       var now = Date.now();
       combo = (now - lastClick <= COMBO_WINDOW) ? combo + 1 : 1;
       lastClick = now;
-
       var v = clickValue() * comboMult();
       var crit = Math.random() < critChance();
       if(crit){ v *= CRIT_MULT; state.critDone = true; }
       v = Math.round(v * 10) / 10;
-
       state.totalClicks++;
       state.totalEarned = Math.round((state.totalEarned + v) * 10) / 10;
       state.xp++;
       setBalance(balance + v);
-
       var prevLevel = state.level;
       renderXp();
       var leveledUp = state.level > prevLevel;
-
       updateStats();
       showCombo();
       checkAchievements();
-
       coinBtn.classList.remove("pop");
       void coinBtn.offsetWidth;
       coinBtn.classList.add("pop");
-
       var fly = document.createElement("span");
       fly.className = "fly-text";
       fly.textContent = (crit ? t("critFly") + " " : "") + "+" + v.toFixed(1);
       coinBtn.appendChild(fly);
       setTimeout(function(){ if(fly.parentNode) fly.parentNode.removeChild(fly); }, 800);
-
       if(leveledUp) renderSkins();
     }
 
@@ -1482,24 +1319,145 @@
       }
     }, 1000);
 
-    function refreshAll(){
-      renderXp();
-      renderSkins();
-      renderShop();
-      renderAchievements();
-      updateStats();
-    }
+    function refreshAll(){ renderXp(); renderSkins(); renderShop(); renderAchievements(); updateStats(); }
     window.refreshClicker = refreshAll;
     window.refreshClickerShop = renderShop;
     refreshAll();
   })();
 
-  /* ---------- INIT ---------- */
   setBalance(balance);
   applyStaticTranslations();
 
 })();
 </script>
+
+<!-- ============ DEVTOOLS OVERLAY ============ -->
+<script>
+(function(){
+  "use strict";
+  if(window.__devtoolsLoaded) return;
+  window.__devtoolsLoaded = true;
+
+  function q(sel){ return document.querySelectorAll(sel); }
+  function readLS(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+
+  var btn = document.createElement("button");
+  btn.id = "__dt_btn";
+  btn.innerHTML = "⚙";
+  document.body.appendChild(btn);
+
+  var panel = document.createElement("div");
+  panel.id = "__dt_panel";
+  panel.innerHTML =
+    '<div id="__dt_head"><b>⚙ DEVTOOLS</b><button id="__dt_close">✕</button></div>' +
+    '<div id="__dt_tabs">' +
+      '<div class="__dt_tab active" data-tab="vars">Переменные</div>' +
+      '<div class="__dt_tab" data-tab="dom">DOM</div>' +
+      '<div class="__dt_tab" data-tab="console">Консоль</div>' +
+      '<div class="__dt_tab" data-tab="quick">Быстро</div>' +
+    '</div>' +
+    '<div id="__dt_body"></div>';
+  document.body.appendChild(panel);
+
+  var body = document.getElementById("__dt_body");
+
+  function renderVars(){
+    var h = "";
+    h += '<div class="__dt_section"><h4>💰 Баланс</h4>';
+    h += '<div class="__dt_row"><span class="k">balance</span><span class="v">' + readLS("zolotoy_stol_balance") + '</span>' +
+         '<button onclick="var v=prompt(\'Новый баланс:\',localStorage.getItem(\'zolotoy_stol_balance\'));if(v!==null){localStorage.setItem(\'zolotoy_stol_balance\',v);location.reload();}">✏</button></div>';
+    h += '</div>';
+
+    var ck = readLS("zolotoy_stol_clicker");
+    var c = {};
+    try { c = JSON.parse(ck) || {}; } catch(e){}
+    h += '<div class="__dt_section"><h4>👆 Кликер</h4>';
+    ["totalClicks","totalEarned","xp","level","skin","upgBought","bizOwned"].forEach(function(f){
+      var val = c[f] !== undefined ? c[f] : "—";
+      h += '<div class="__dt_row"><span class="k">' + f + '</span><span class="v">' + val + '</span>' +
+           '<button onclick="(function(){var c=JSON.parse(localStorage.getItem(\'zolotoy_stol_clicker\')||\'{}\');var v=prompt(\'' + f + ':\',c.' + f + ');if(v===null)return;c.' + f + '=isNaN(v)?v:Number(v);localStorage.setItem(\'zolotoy_stol_clicker\',JSON.stringify(c));location.reload();})()">✏</button></div>';
+    });
+    h += '<div class="__dt_row"><span class="k">upgrades</span><span class="v">' + JSON.stringify(c.upgrades||{}) + '</span>' +
+         '<button onclick="(function(){var c=JSON.parse(localStorage.getItem(\'zolotoy_stol_clicker\')||\'{}\');var v=prompt(\'upgrades (JSON):\',JSON.stringify(c.upgrades||{}));if(v===null)return;try{c.upgrades=JSON.parse(v);localStorage.setItem(\'zolotoy_stol_clicker\',JSON.stringify(c));location.reload();}catch(e){alert(\'Bad JSON\')}})()">✏</button></div>';
+    h += '<div class="__dt_row"><span class="k">biz</span><span class="v">' + JSON.stringify(c.biz||{}) + '</span>' +
+         '<button onclick="(function(){var c=JSON.parse(localStorage.getItem(\'zolotoy_stol_clicker\')||\'{}\');var v=prompt(\'biz (JSON):\',JSON.stringify(c.biz||{}));if(v===null)return;try{c.biz=JSON.parse(v);localStorage.setItem(\'zolotoy_stol_clicker\',JSON.stringify(c));location.reload();}catch(e){alert(\'Bad JSON\')}})()">✏</button></div>';
+    h += '</div>';
+    body.innerHTML = h;
+  }
+
+  function renderDom(){
+    var h = '<div class="__dt_section"><h4>🎛 Ставки (data-атрибуты)</h4>';
+    ["slotbet","roubet","bjbet"].forEach(function(a){
+      h += '<div style="font-size:11px;color:#b7ac93;margin:6px 0 3px;">data-' + a + '</div>';
+      q("[data-"+a+"]").forEach(function(el,i){
+        h += '<div class="__dt_row"><span class="k">#'+i+' ['+el.textContent+']</span><span class="v">'+el.getAttribute("data-"+a)+'</span>' +
+             '<button onclick="(function(){var v=prompt(\'Номинал:\',\'' + el.getAttribute("data-"+a) + '\');if(v===null)return;var els=document.querySelectorAll(\'[data-'+a+']\');els['+i+'].setAttribute(\'data-'+a+'\',v);els['+i+'].textContent=v;})()">✏</button></div>';
+      });
+    });
+    h += '</div>';
+
+    h += '<div class="__dt_section"><h4>🎯 Все чипы</h4>';
+    q(".chip-btn").forEach(function(el,i){
+      h += '<div class="__dt_row"><span class="k">chip#'+i+'</span><span class="v">'+el.textContent+'</span>' +
+           '<button onclick="(function(){var v=prompt(\'Текст:\',\'' + el.textContent + '\');if(v!==null)document.querySelectorAll(\'.chip-btn\')['+i+'].textContent=v;})()">✏</button></div>';
+    });
+    h += '</div>';
+
+    h += '<div class="__dt_section"><h4>🔎 Любой элемент</h4>' +
+         '<div class="__dt_row"><span class="k">CSS-селектор</span><input id="__dt_sel" style="flex:1;background:#000;color:#0f0;border:1px solid #8a6f2a;border-radius:4px;padding:4px;font-size:11px;" placeholder=".num-cell"></div>' +
+         '<div class="__dt_row"><button onclick="(function(){var s=document.getElementById(\'__dt_sel\').value;var el=document.querySelector(s);if(!el){alert(\'Не найдено\');return;}var v=prompt(\'innerHTML:\',el.innerHTML);if(v!==null)el.innerHTML=v;})()">✏ innerHTML</button>' +
+         '<button onclick="(function(){var s=document.getElementById(\'__dt_sel\').value;var el=document.querySelector(s);if(!el){alert(\'Не найдено\');return;}var v=prompt(\'value:\',el.value||\'\');if(v!==null)el.value=v;})()">✏ value</button>' +
+         '<button class="danger" onclick="(function(){var s=document.getElementById(\'__dt_sel\').value;document.querySelectorAll(s).forEach(function(e){e.remove();});})()">🗑 Удалить</button></div></div>';
+    body.innerHTML = h;
+  }
+
+  function renderConsole(){
+    body.innerHTML =
+      '<div class="__dt_section"><h4>⚡ JS-консоль</h4>' +
+      '<textarea id="__dt_console" placeholder="// любой код"></textarea>' +
+      '<button class="__dt_quick" style="margin-top:8px;width:100%;padding:9px;background:linear-gradient(180deg,#f2cf7e,#d4af37);border:none;border-radius:6px;color:#2a1e05;font-weight:bold;cursor:pointer;" onclick="(function(){try{eval(document.getElementById(\'__dt_console\').value);}catch(e){alert(\'Error: \'+e.message)}})()">▶ Выполнить</button></div>' +
+      '<div class="__dt_section"><h4>📋 Быстрые команды</h4><div class="__dt_quick">' +
+      '<button onclick="localStorage.setItem(\'zolotoy_stol_balance\',\'9999999\');location.reload();">+9.9M баланс</button>' +
+      '<button onclick="(function(){var c=JSON.parse(localStorage.getItem(\'zolotoy_stol_clicker\')||\'{}\');c.xp=999999;c.level=50;localStorage.setItem(\'zolotoy_stol_clicker\',JSON.stringify(c));location.reload();})()">Ур. 50</button>' +
+      '<button onclick="(function(){var c=JSON.parse(localStorage.getItem(\'zolotoy_stol_clicker\')||\'{}\');c.upgrades={power:100,gold:1,crit:3};localStorage.setItem(\'zolotoy_stol_clicker\',JSON.stringify(c));location.reload();})()">Max апгрейды</button>' +
+      '<button class="dark" onclick="(function(){var s=JSON.parse(localStorage.getItem(\'zolotoy_stol_clicker\')||\'{}\');s.ach={c100:1,c1000:1,c10000:1,c100000:1,c500000:1,c1m:1,e500:1,e5k:1,e50k:1,lvl5:1,lvl10:1,firstUp:1,crit:1,biz:1};localStorage.setItem(\'zolotoy_stol_clicker\',JSON.stringify(s));location.reload();})()">Все ачивки</button>' +
+      '<button class="danger" onclick="if(confirm(\'Сбросить ВСЁ?\')){localStorage.removeItem(\'zolotoy_stol_balance\');localStorage.removeItem(\'zolotoy_stol_clicker\');location.reload();}">Сброс</button>' +
+      '</div></div>';
+  }
+
+  function renderQuick(){
+    body.innerHTML =
+      '<div class="__dt_section"><h4>🎛 Сменить ставку на 1 000 000</h4><div class="__dt_quick">' +
+      '<button onclick="document.querySelectorAll(\'[data-slotbet]\')[3].setAttribute(\'data-slotbet\',\'1000000\');document.querySelectorAll(\'[data-slotbet]\')[3].textContent=\'1M\';alert(\'Слоты OK\')">Слоты</button>' +
+      '<button onclick="document.querySelectorAll(\'[data-roubet]\')[3].setAttribute(\'data-roubet\',\'1000000\');document.querySelectorAll(\'[data-roubet]\')[3].textContent=\'1M\';alert(\'Рулетка OK\')">Рулетка</button>' +
+      '<button onclick="document.querySelectorAll(\'[data-bjbet]\')[3].setAttribute(\'data-bjbet\',\'1000000\');document.querySelectorAll(\'[data-bjbet]\')[3].textContent=\'1M\';alert(\'Блэкджек OK\')">Блэкджек</button>' +
+      '</div></div>' +
+      '<div class="__dt_section"><h4>🏷 Сменить название игры</h4>' +
+      '<div class="__dt_row"><input id="__dt_title" style="flex:1;background:#000;color:#0f0;border:1px solid #8a6f2a;border-radius:4px;padding:4px;font-size:11px;" placeholder="Новое название">' +
+      '<button onclick="var v=document.getElementById(\'__dt_title\').value;if(v)document.querySelectorAll(\'.brand-name,.game-title\').forEach(function(e){e.textContent=v;});">OK</button></div></div>';
+  }
+
+  function setTab(name){
+    document.querySelectorAll(".__dt_tab").forEach(function(x){ x.classList.toggle("active", x.dataset.tab === name); });
+    if(name === "vars") renderVars();
+    else if(name === "dom") renderDom();
+    else if(name === "console") renderConsole();
+    else if(name === "quick") renderQuick();
+  }
+
+  document.querySelectorAll(".__dt_tab").forEach(function(tab){
+    tab.onclick = function(){ setTab(tab.dataset.tab); };
+  });
+  document.getElementById("__dt_close").onclick = function(){ panel.classList.remove("open"); };
+  btn.onclick = function(){
+    panel.classList.toggle("open");
+    if(panel.classList.contains("open")) setTab("vars");
+  };
+
+  window.__devtools = { toggle: function(){ btn.onclick(); } };
+})();
+</script>
+
 <script>
 if("serviceWorker" in navigator){
   window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); });
