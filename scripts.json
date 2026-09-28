@@ -1,0 +1,224 @@
+{
+  "categories": [
+    {
+      "title": "💰 Баланс",
+      "scripts": [
+        {
+          "name": "Баланс 100M",
+          "description": "Устанавливает баланс в 100 000 000 фишек",
+          "code": "localStorage.setItem('zolotoy_stol_balance','100000000');location.reload();"
+        },
+        {
+          "name": "Баланс 900T",
+          "description": "Устанавливает баланс в 900 триллионов. Прибавки могут не работать.",
+          "code": "localStorage.setItem('zolotoy_stol_balance','900000000000000');location.reload();"
+        },
+        {
+          "name": "Баланс +1M",
+          "description": "Добавляет 1 000 000 к текущему балансу",
+          "code": "localStorage.setItem('zolotoy_stol_balance', String(parseFloat(localStorage.getItem('zolotoy_stol_balance')||0) + 1000000));location.reload();"
+        },
+        {
+          "name": "Обнулить баланс",
+          "description": "Ставит баланс в 0 (сработает авто-долив 1000)",
+          "code": "localStorage.setItem('zolotoy_stol_balance','0');location.reload();"
+        }
+      ]
+    },
+    {
+      "title": "👆 Кликер",
+      "scripts": [
+        {
+          "name": "Уровень 50",
+          "description": "Открывает все скины кликера",
+          "code": "var c=JSON.parse(localStorage.getItem('zolotoy_stol_clicker')||'{}');c.xp=999999;c.level=50;localStorage.setItem('zolotoy_stol_clicker',JSON.stringify(c));location.reload();"
+        },
+        {
+          "name": "Max апгрейды",
+          "description": "Прокачивает силу клика, золото и криты",
+          "code": "var c=JSON.parse(localStorage.getItem('zolotoy_stol_clicker')||'{}');c.upgrades={power:100,gold:1,crit:3};localStorage.setItem('zolotoy_stol_clicker',JSON.stringify(c));location.reload();"
+        },
+        {
+          "name": "Max бизнесы",
+          "description": "Ларёк, кафе и филиал казино на 999 уровень",
+          "code": "var c=JSON.parse(localStorage.getItem('zolotoy_stol_clicker')||'{}');c.biz={kiosk:999,cafe:999,casinoB:999};localStorage.setItem('zolotoy_stol_clicker',JSON.stringify(c));location.reload();"
+        },
+        {
+          "name": "Все ачивки",
+          "description": "Открывает все достижения кликера",
+          "code": "var c=JSON.parse(localStorage.getItem('zolotoy_stol_clicker')||'{}');c.ach={c100:1,c1000:1,c10000:1,c100000:1,c500000:1,c1m:1,e500:1,e5k:1,e50k:1,lvl5:1,lvl10:1,firstUp:1,crit:1,biz:1};localStorage.setItem('zolotoy_stol_clicker',JSON.stringify(c));location.reload();"
+        },
+        {
+          "name": "Полный прокач кликера",
+          "description": "Уровень 50 + макс. апгрейды + макс. бизнесы + все ачивки + скин 🔥",
+          "code": "var c=JSON.parse(localStorage.getItem('zolotoy_stol_clicker')||'{}');c.xp=999999;c.level=50;c.upgrades={power:100,gold:1,crit:3};c.biz={kiosk:999,cafe:999,casinoB:999};c.skin='🔥';c.ach={c100:1,c1000:1,c10000:1,c100000:1,c500000:1,c1m:1,e500:1,e5k:1,e50k:1,lvl5:1,lvl10:1,firstUp:1,crit:1,biz:1};localStorage.setItem('zolotoy_stol_clicker',JSON.stringify(c));location.reload();"
+        }
+      ]
+    },
+    {
+      "title": "🎛 Ставки",
+      "scripts": [
+        {
+          "name": "Все ставки 1M",
+          "description": "Меняет номинал последней кнопки во всех играх на 1 000 000",
+          "code": "['slotbet','roubet','bjbet'].forEach(function(a){var e=document.querySelectorAll('[data-'+a+']');if(e[3]){e[3].setAttribute('data-'+a,'1000000');e[3].textContent='1M';}});"
+        },
+        {
+          "name": "Слоты 1M",
+          "description": "Только для слотов",
+          "code": "var e=document.querySelectorAll('[data-slotbet]');if(e[3]){e[3].setAttribute('data-slotbet','1000000');e[3].textContent='1M';}"
+        },
+        {
+          "name": "Рулетка 1M",
+          "description": "Только для рулетки",
+          "code": "var e=document.querySelectorAll('[data-roubet]');if(e[3]){e[3].setAttribute('data-roubet','1000000');e[3].textContent='1M';}"
+        },
+        {
+          "name": "Блэкджек 1M",
+          "description": "Только для блэкджека",
+          "code": "var e=document.querySelectorAll('[data-bjbet]');if(e[3]){e[3].setAttribute('data-bjbet','1000000');e[3].textContent='1M';}"
+        }
+      ]
+    },
+    {
+      "title": "🎨 Внешний вид",
+      "scripts": [
+        {
+          "name": "Рандомный редизайн",
+          "description": "Полностью меняет цвета, шрифты, фон и размеры всех элементов",
+          "code": "(function(){var c=['#ff006e','#8338ec','#3a86ff','#06ffa5','#ffbe0b','#fb5607','#8ecae6','#e63946'];var f=['Georgia,serif','Arial','Courier New','Impact','Comic Sans MS'];var r=function(a){return a[Math.floor(Math.random()*a.length)]};document.querySelectorAll('*').forEach(function(e){if(e.closest('#__dt_panel')||e.id==='__dt_btn')return;e.style.color=r(c);e.style.fontFamily=r(f);e.style.fontSize=Math.floor(Math.random()*15+11)+'px';e.style.textShadow='0 0 10px '+r(c);if(e.tagName==='BUTTON'||e.classList.contains('table-card')){e.style.background=r(c);e.style.color='#fff'}});document.body.style.background='url(https://picsum.photos/1600/1200?random='+Date.now()+') center/cover fixed'})();"
+        },
+        {
+          "name": "Всё становится ДЕПНУТЬ",
+          "description": "Заменяет все тексты и иконки на слово ДЕПНУТЬ",
+          "code": "(function(){var W='ДЕПНУТЬ';function f(n){if(n.nodeType===3){if(n.nodeValue.trim())n.nodeValue=W}else if(n.nodeType===1){if(n.closest('#__dt_panel')||n.id==='__dt_btn'||n.tagName==='SCRIPT'||n.tagName==='STYLE')return;for(var i=0;i<n.childNodes.length;i++)f(n.childNodes[i])}}f(document.body);document.title=W})();"
+        },
+        {
+          "name": "Цикл ДЕПНУТЬ",
+          "description": "Каждые 200мс проверяет — если что-то не ДЕПНУТЬ, делает ДЕПНУТЬ",
+          "code": "(function(){var W='ДЕПНУТЬ';if(window.__depnutLoop)clearInterval(window.__depnutLoop);function f(n){if(n.nodeType===3){if(n.nodeValue.trim()&&n.nodeValue.trim()!==W)n.nodeValue=W}else if(n.nodeType===1){if(n.closest('#__dt_panel')||n.id==='__dt_btn'||n.tagName==='SCRIPT'||n.tagName==='STYLE')return;for(var i=0;i<n.childNodes.length;i++)f(n.childNodes[i])}}function run(){try{f(document.body);if(document.title!==W)document.title=W}catch(e){}}run();window.__depnutLoop=setInterval(run,200)})();"
+        },
+        {
+          "name": "Радужный фон",
+          "description": "Фон переливается всеми цветами радуги",
+          "code": "setInterval(function(){document.body.style.background='hsl('+(Date.now()/10%360)+',80%,20%)'},50);"
+        }
+      ]
+    },
+    {
+      "title": "😂 Приколы",
+      "scripts": [
+        {
+          "name": "Конфетти",
+          "description": "100 эмодзи 🎉 летят сверху",
+          "code": "for(var i=0;i<100;i++){var c=document.createElement('div');c.textContent='🎉';c.style.cssText='position:fixed;left:'+(Math.random()*100)+'%;top:-50px;font-size:'+(20+Math.random()*30)+'px;z-index:99999;transition:all 2s;pointer-events:none;';document.body.appendChild(c);(function(el){setTimeout(function(){el.style.top='110vh';el.style.transform='rotate('+(Math.random()*720)+'deg)'},50);setTimeout(function(){el.remove()},2500)})(c)}"
+        },
+        {
+          "name": "Дождь из 💩",
+          "description": "Какашки падают сверху бесконечно",
+          "code": "setInterval(function(){var e=document.createElement('div');e.textContent='💩';e.style.cssText='position:fixed;left:'+(Math.random()*100)+'%;top:-50px;font-size:40px;z-index:99999;pointer-events:none;transition:top 2s linear;';document.body.appendChild(e);setTimeout(function(){e.style.top='110vh'},50);setTimeout(function(){e.remove()},2200)},150);"
+        },
+        {
+          "name": "Дождь из золота",
+          "description": "💰 падают сверху бесконечно",
+          "code": "setInterval(function(){var e=document.createElement('div');e.textContent='💰';e.style.cssText='position:fixed;left:'+(Math.random()*100)+'%;top:-50px;font-size:40px;z-index:99999;pointer-events:none;transition:top 2s linear;';document.body.appendChild(e);setTimeout(function(){e.style.top='110vh'},50);setTimeout(function(){e.remove()},2200)},80);"
+        },
+        {
+          "name": "Тряска страницы",
+          "description": "Всё трясётся 10 раз",
+          "code": "document.body.animate([{transform:'translate(0,0)'},{transform:'translate(5px,-5px)'},{transform:'translate(-5px,5px)'},{transform:'translate(0,0)'}],{duration:300,iterations:10});"
+        },
+        {
+          "name": "Перевернуть игру",
+          "description": "Вся страница переворачивается на 180°",
+          "code": "document.documentElement.style.transition='transform 1s';document.documentElement.style.transform='rotate(180deg)';"
+        },
+        {
+          "name": "Крутящаяся игра",
+          "description": "Вся страница бесконечно вращается",
+          "code": "document.documentElement.style.transition='transform 2s linear';setInterval(function(){document.documentElement.style.transform='rotate('+(Date.now()/10%360)+'deg)'},50);"
+        },
+        {
+          "name": "Синий экран смерти",
+          "description": "Фейковый BSOD на весь экран",
+          "code": "document.body.innerHTML='<div style=\"position:fixed;inset:0;background:#0078d7;color:#fff;font-family:monospace;padding:40px;z-index:99999;font-size:14px;line-height:1.8;\"><div style=\"font-size:80px;margin-bottom:20px;\">:(</div><div style=\"font-size:20px;margin-bottom:30px;\">На вашем ПК возникла проблема</div><div>STOP CODE: CASINO_HACKED</div><div style=\"margin-top:30px;\">0% завершено</div></div>';"
+        }
+      ]
+    },
+    {
+      "title": "🎮 Логика игры",
+      "scripts": [
+        {
+          "name": "Слоты всегда выигрывают",
+          "description": "Math.random переопределён — каждый спин джекпот",
+          "code": "if(window.__slotHack)clearInterval(window.__slotHack);window.__slotHack=setInterval(function(){Math.random=function(){return 0.01}},10);alert('Слоты теперь всегда выигрывают')"
+        },
+        {
+          "name": "Рулетка всегда красное",
+          "description": "Колесо всегда останавливается на красном",
+          "code": "if(window.__rouHack)clearInterval(window.__rouHack);window.__rouHack=setInterval(function(){Math.random=function(){return 0.1}},10);alert('Рулетка всегда красное')"
+        },
+        {
+          "name": "Дилер всегда перебирает",
+          "description": "В блэкджеке дилер всегда тянет плохие карты",
+          "code": "if(window.__bjHack)clearInterval(window.__bjHack);window.__bjHack=setInterval(function(){Math.random=function(){return 0.99}},10);alert('Дилер всегда перебирает')"
+        },
+        {
+          "name": "Баланс никогда не уменьшается",
+          "description": "localStorage перехватывает запись — баланс только растёт",
+          "code": "(function(){if(window.__balGuard)return;window.__balGuard=true;var orig=localStorage.setItem.bind(localStorage);localStorage.setItem=function(k,v){if(k==='zolotoy_stol_balance'){var cur=parseFloat(localStorage.getItem(k)||0);var nw=parseFloat(v);if(nw<cur)v=String(cur)}return orig(k,v)}})();alert('Баланс защищён от уменьшения')"
+        },
+        {
+          "name": "Выигрыши ×100",
+          "description": "Любое начисление на баланс умножается на 100",
+          "code": "(function(){if(window.__winBoost)return;window.__winBoost=true;var orig=localStorage.setItem.bind(localStorage);localStorage.setItem=function(k,v){if(k==='zolotoy_stol_balance'){var cur=parseFloat(localStorage.getItem(k)||0);var nw=parseFloat(v);if(nw>cur)v=String(cur+(nw-cur)*100)}return orig(k,v)}})();alert('Выигрыши ×100')"
+        },
+        {
+          "name": "Остановить все хаки",
+          "description": "Убивает все интервалы и перезагружает",
+          "code": "for(var i=1;i<99999;i++)clearInterval(i);location.reload();"
+        }
+      ]
+    },
+    {
+      "title": "🔀 Хаос",
+      "scripts": [
+        {
+          "name": "Тасовка кнопок (цикл)",
+          "description": "Кнопки постоянно перемешиваются — названия и действия едут вместе. Остановить: clearInterval(window.__btnShuffleLoop);location.reload()",
+          "code": "(function(){if(window.__btnShuffleLoop)clearInterval(window.__btnShuffleLoop);function s(){var b=Array.from(document.querySelectorAll('button')).filter(function(x){return !x.closest('#__dt_panel')&&x.id!=='__dt_btn'});if(b.length<2)return;var o=b.map(function(x){return{html:x.innerHTML,onclick:x.onclick}});var ord=b.map(function(_,i){return i});for(var i=ord.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=ord[i];ord[i]=ord[j];ord[j]=t}b.forEach(function(x,i){var d=o[ord[i]];x.innerHTML=d.html;x.onclick=d.onclick})}s();window.__btnShuffleLoop=setInterval(s,2000);alert('🔁 Кнопки тасуются каждые 2 секунды')})();"
+        },
+        {
+          "name": "Остановить тасовку",
+          "description": "Убирает цикл тасовки кнопок",
+          "code": "if(window.__btnShuffleLoop){clearInterval(window.__btnShuffleLoop);alert('⏹ Тасовка остановлена')}else{alert('Тасовка не была запущена')}"
+        },
+        {
+          "name": "Стоп-кран",
+          "description": "Останавливает ВСЕ эффекты и возвращает всё как было",
+          "code": "(function(){for(var i=1;i<99999;i++)clearInterval(i);for(var i=1;i<99999;i++)clearTimeout(i);window.requestAnimationFrame=function(){return 0};document.documentElement.style.cssText='';document.body.style.cssText='';console.log('Все эффекты остановлены')})();"
+        }
+      ]
+    },
+    {
+      "title": "💣 Опасное",
+      "scripts": [
+        {
+          "name": "Полный сброс игры",
+          "description": "Удаляет ВСЁ — баланс, кликер, язык. Игра как новая",
+          "code": "if(confirm('Сбросить ВСЁ?')){localStorage.removeItem('zolotoy_stol_balance');localStorage.removeItem('zolotoy_stol_clicker');localStorage.removeItem('zolotoy_stol_lang');location.reload();}"
+        },
+        {
+          "name": "Сбросить CSS-изменения",
+          "description": "Удаляет сохранённые в инспекторе стили",
+          "code": "localStorage.removeItem('__dt_changes');location.reload();"
+        },
+        {
+          "name": "Убить Service Worker",
+          "description": "Отключает кэш — свежие файлы будут грузиться сразу",
+          "code": "(async function(){if('serviceWorker' in navigator){var r=await navigator.serviceWorker.getRegistrations();for(var x of r)await x.unregister()}if('caches' in window){var k=await caches.keys();for(var c of k)await caches.delete(c)}alert('SW убит');location.reload()})();"
+        }
+      ]
+    }
+  ]
+}
