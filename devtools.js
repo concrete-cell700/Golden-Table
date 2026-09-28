@@ -18,11 +18,12 @@
     .__dt_section{margin-bottom:14px;}
     .__dt_section>h4{margin:0 0 6px;font-size:12px;color:#f2cf7e;font-family:Georgia,serif;border-bottom:1px dashed #8a6f2a;padding-bottom:4px;}
     .__dt_row{display:flex;align-items:center;gap:6px;padding:5px 6px;background:#0d1f17;border:1px solid #1e3a2a;border-radius:6px;margin-bottom:4px;font-size:11px;}
-    .__dt_row .k{flex:0 0 42%;color:#b7ac93;word-break:break-all;}
+    .__dt_row .k{flex:0 0 34%;color:#b7ac93;word-break:break-all;}
     .__dt_row .v{flex:1;color:#f2cf7e;font-weight:bold;word-break:break-all;}
     .__dt_row button{background:#1a3a28;border:1px solid #d4af37;color:#f2cf7e;border-radius:5px;padding:3px 7px;font-size:10px;cursor:pointer;}
     .__dt_row button:hover{background:#d4af37;color:#2a1e05;}
     .__dt_row button.danger{background:#3a1a1a;border-color:#b8342a;color:#d9534a;}
+    .__dt_row input.__dt_in{background:#000;color:#0f0;border:1px solid #8a6f2a;border-radius:4px;padding:4px;font-size:11px;font-family:monospace;min-width:0;}
     #__dt_console{width:100%;background:#000;color:#0f0;border:1px solid #d4af37;border-radius:6px;padding:8px;font-family:monospace;font-size:12px;min-height:90px;resize:vertical;box-sizing:border-box;}
     .__dt_quick{display:flex;flex-wrap:wrap;gap:6px;}
     .__dt_quick button{flex:1;min-width:90px;padding:8px 6px;background:linear-gradient(180deg,#f2cf7e,#d4af37);border:none;border-radius:6px;color:#2a1e05;font-weight:bold;font-size:11px;cursor:pointer;}
@@ -53,52 +54,87 @@
   function q(sel){ return document.querySelectorAll(sel); }
   function readLS(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
 
-  // Безопасное отображение значения
   function fmt(v){
-    if(v === null || v === undefined || v === "") return "—";
+    if(v === null || v === undefined || v === "") return "";
     if(typeof v === "object"){ try { return JSON.stringify(v); } catch(e){ return "[obj]"; } }
     return String(v);
   }
-  // Безопасно достать одно поле
   function getField(field){
     try {
       var c = JSON.parse(readLS("zolotoy_stol_clicker") || "{}") || {};
       return c[field];
     } catch(e){ return undefined; }
   }
+  function escapeAttr(s){
+    return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/'/g,"&#39;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
 
-  // ====== ВКЛАДКА ПЕРЕМЕННЫЕ (просто setItem + reload) ======
+  // ====== ВКЛАДКА ПЕРЕМЕННЫЕ ======
   function renderVars(){
     var h = "";
 
     // БАЛАНС
     h += '<div class="__dt_section"><h4>💰 Баланс</h4>';
-    h += '<div class="__dt_row"><span class="k">balance</span><span class="v">' + fmt(readLS("zolotoy_stol_balance")) + '</span>' +
-         '<button onclick="var v=prompt(\'Баланс:\',localStorage.getItem(\'zolotoy_stol_balance\')||\'\');if(v===null)return;localStorage.setItem(\'zolotoy_stol_balance\',v);sessionStorage.setItem(\'__dt_auto\',\'1\');location.reload();">✏</button></div>';
+    h += '<div class="__dt_row">' +
+         '<span class="k">zolotoy_stol_balance</span>' +
+         '<input class="__dt_in" data-store="zolotoy_stol_balance" value="' + escapeAttr(readLS("zolotoy_stol_balance")||"") + '">' +
+         '<button class="__dt_apply_ls" data-store="zolotoy_stol_balance">OK</button>' +
+         '</div>';
     h += '</div>';
 
     // КЛИКЕР
-    h += '<div class="__dt_section"><h4>👆 Кликер</h4>';
-
-    // простые поля
-    ["totalClicks","totalEarned","xp","level","skin","upgBought","bizOwned"].forEach(function(f){
-      h += '<div class="__dt_row"><span class="k">' + f + '</span><span class="v">' + fmt(getField(f)) + '</span>' +
-           '<button onclick="var c=JSON.parse(localStorage.getItem(\'zolotoy_stol_clicker\')||\'{}\');var v=prompt(\'' + f + ':\',c.' + f + '!==undefined?c.' + f + ':\'\');if(v===null)return;c.' + f + '=v;localStorage.setItem(\'zolotoy_stol_clicker\',JSON.stringify(c));sessionStorage.setItem(\'__dt_auto\',\'1\');location.reload();">✏</button></div>';
+    h += '<div class="__dt_section"><h4>👆 Кликер (zolotoy_stol_clicker)</h4>';
+    ["totalClicks","totalEarned","xp","skin","upgBought","bizOwned"].forEach(function(f){
+      h += '<div class="__dt_row">' +
+           '<span class="k">' + f + '</span>' +
+           '<input class="__dt_in" data-field="' + f + '" value="' + escapeAttr(fmt(getField(f))) + '">' +
+           '<button class="__dt_apply_field" data-field="' + f + '">OK</button>' +
+           '</div>';
     });
-
-    // JSON-поля
-    h += '<div class="__dt_row"><span class="k">upgrades</span><span class="v">' + fmt(getField("upgrades")) + '</span>' +
-         '<button onclick="var c=JSON.parse(localStorage.getItem(\'zolotoy_stol_clicker\')||\'{}\');var v=prompt(\'upgrades (JSON):\',JSON.stringify(c.upgrades||{}));if(v===null)return;try{c.upgrades=JSON.parse(v)}catch(e){alert(\'Bad JSON\');return}localStorage.setItem(\'zolotoy_stol_clicker\',JSON.stringify(c));sessionStorage.setItem(\'__dt_auto\',\'1\');location.reload();">✏</button></div>';
-
-    h += '<div class="__dt_row"><span class="k">biz</span><span class="v">' + fmt(getField("biz")) + '</span>' +
-         '<button onclick="var c=JSON.parse(localStorage.getItem(\'zolotoy_stol_clicker\')||\'{}\');var v=prompt(\'biz (JSON):\',JSON.stringify(c.biz||{}));if(v===null)return;try{c.biz=JSON.parse(v)}catch(e){alert(\'Bad JSON\');return}localStorage.setItem(\'zolotoy_stol_clicker\',JSON.stringify(c));sessionStorage.setItem(\'__dt_auto\',\'1\');location.reload();">✏</button></div>';
-
-    h += '<div class="__dt_row"><span class="k">ach</span><span class="v">' + fmt(getField("ach")) + '</span>' +
-         '<button onclick="var c=JSON.parse(localStorage.getItem(\'zolotoy_stol_clicker\')||\'{}\');var v=prompt(\'ach (JSON):\',JSON.stringify(c.ach||{}));if(v===null)return;try{c.ach=JSON.parse(v)}catch(e){alert(\'Bad JSON\');return}localStorage.setItem(\'zolotoy_stol_clicker\',JSON.stringify(c));sessionStorage.setItem(\'__dt_auto\',\'1\');location.reload();">✏</button></div>';
-
+    ["upgrades","biz","ach"].forEach(function(f){
+      h += '<div class="__dt_row">' +
+           '<span class="k">' + f + ' (JSON)</span>' +
+           '<input class="__dt_in" data-field="' + f + '" value="' + escapeAttr(fmt(getField(f))) + '">' +
+           '<button class="__dt_apply_field" data-field="' + f + '" data-json="1">OK</button>' +
+           '</div>';
+    });
     h += '</div>';
 
     body.innerHTML = h;
+
+    body.querySelectorAll(".__dt_apply_ls").forEach(function(b){
+      b.onclick = function(){
+        var key = b.dataset.store;
+        var inp = body.querySelector('.__dt_in[data-store="' + key + '"]');
+        var v = inp.value;
+        if(v === "") return;
+        localStorage.setItem(key, v);
+        sessionStorage.setItem("__dt_auto", "1");
+        location.reload();
+      };
+    });
+
+    body.querySelectorAll(".__dt_apply_field").forEach(function(b){
+      b.onclick = function(){
+        var f = b.dataset.field;
+        var inp = body.querySelector('.__dt_in[data-field="' + f + '"]');
+        var v = inp.value;
+        var c;
+        try { c = JSON.parse(readLS("zolotoy_stol_clicker") || "{}") || {}; } catch(e){ c = {}; }
+
+        if(b.dataset.json === "1"){
+          try { c[f] = JSON.parse(v); }
+          catch(e){ alert("Плохой JSON: " + e.message); return; }
+        } else {
+          var num = Number(v);
+          c[f] = (v !== "" && !isNaN(num)) ? num : v;
+        }
+
+        localStorage.setItem("zolotoy_stol_clicker", JSON.stringify(c));
+        sessionStorage.setItem("__dt_auto", "1");
+        location.reload();
+      };
+    });
   }
 
   // ====== ВКЛАДКА DOM ======
@@ -107,17 +143,41 @@
     ["slotbet","roubet","bjbet"].forEach(function(a){
       h += '<div style="font-size:11px;color:#b7ac93;margin:6px 0 3px;">data-' + a + '</div>';
       q("[data-"+a+"]").forEach(function(el,i){
-        h += '<div class="__dt_row"><span class="k">#'+i+' ['+el.textContent+']</span><span class="v">'+el.getAttribute("data-"+a)+'</span>' +
-             '<button onclick="(function(){var v=prompt(\'Номинал:\',\'' + el.getAttribute("data-"+a) + '\');if(v===null)return;var els=document.querySelectorAll(\'[data-'+a+']\');els['+i+'].setAttribute(\'data-'+a+'\',v);els['+i+'].textContent=v;})()">✏</button></div>';
+        h += '<div class="__dt_row"><span class="k">#'+i+' ['+escapeAttr(el.textContent)+']</span>' +
+             '<input class="__dt_in" data-attr="'+a+'" data-idx="'+i+'" value="' + escapeAttr(el.getAttribute("data-"+a)) + '">' +
+             '<button class="__dt_apply_attr" data-attr="'+a+'" data-idx="'+i+'">OK</button></div>';
       });
     });
     h += '</div>';
-    h += '<div class="__dt_section"><h4>🔎 Любой элемент</h4>' +
-         '<div class="__dt_row"><span class="k">CSS-селектор</span><input id="__dt_sel" style="flex:1;background:#000;color:#0f0;border:1px solid #8a6f2a;border-radius:4px;padding:4px;font-size:11px;" placeholder=".num-cell"></div>' +
-         '<div class="__dt_row"><button onclick="(function(){var s=document.getElementById(\'__dt_sel\').value;var el=document.querySelector(s);if(!el){alert(\'Не найдено\');return;}var v=prompt(\'innerHTML:\',el.innerHTML);if(v!==null)el.innerHTML=v;})()">✏ innerHTML</button>' +
-         '<button onclick="(function(){var s=document.getElementById(\'__dt_sel\').value;var el=document.querySelector(s);if(!el){alert(\'Не найдено\');return;}var v=prompt(\'value:\',el.value||\'\');if(v!==null)el.value=v;})()">✏ value</button>' +
-         '<button class="danger" onclick="(function(){var s=document.getElementById(\'__dt_sel\').value;document.querySelectorAll(s).forEach(function(e){e.remove();});})()">🗑 Удалить</button></div></div>';
+    h += '<div class="__dt_section"><h4>🎯 Все чипы</h4>';
+    q(".chip-btn").forEach(function(el,i){
+      h += '<div class="__dt_row"><span class="k">chip#'+i+'</span>' +
+           '<input class="__dt_in" data-chip="'+i+'" value="' + escapeAttr(el.textContent) + '">' +
+           '<button class="__dt_apply_chip" data-idx="'+i+'">OK</button></div>';
+    });
+    h += '</div>';
     body.innerHTML = h;
+
+    body.querySelectorAll(".__dt_apply_attr").forEach(function(b){
+      b.onclick = function(){
+        var a = b.dataset.attr, i = +b.dataset.idx;
+        var inp = body.querySelector('.__dt_in[data-attr="'+a+'"][data-idx="'+i+'"]');
+        var v = inp.value;
+        var els = document.querySelectorAll('[data-'+a+']');
+        if(!els[i]) return;
+        els[i].setAttribute('data-'+a, v);
+        els[i].textContent = v;
+      };
+    });
+
+    body.querySelectorAll(".__dt_apply_chip").forEach(function(b){
+      b.onclick = function(){
+        var i = +b.dataset.idx;
+        var inp = body.querySelector('.__dt_in[data-chip="'+i+'"]');
+        var els = document.querySelectorAll('.chip-btn');
+        if(els[i]) els[i].textContent = inp.value;
+      };
+    });
   }
 
   // ====== ВКЛАДКА КОНСОЛЬ ======
@@ -125,32 +185,52 @@
     body.innerHTML =
       '<div class="__dt_section"><h4>⚡ JS-консоль</h4>' +
       '<textarea id="__dt_console" placeholder="// любой код"></textarea>' +
-      '<button class="__dt_quick" style="margin-top:8px;width:100%;padding:9px;background:linear-gradient(180deg,#f2cf7e,#d4af37);border:none;border-radius:6px;color:#2a1e05;font-weight:bold;cursor:pointer;" onclick="(function(){try{eval(document.getElementById(\'__dt_console\').value);}catch(e){alert(\'Error: \'+e.message)}})()">▶ Выполнить</button></div>' +
+      '<button id="__dt_run" style="margin-top:8px;width:100%;padding:9px;background:linear-gradient(180deg,#f2cf7e,#d4af37);border:none;border-radius:6px;color:#2a1e05;font-weight:bold;cursor:pointer;">▶ Выполнить</button></div>' +
       '<div class="__dt_section"><h4>📋 Быстрые команды</h4><div class="__dt_quick">' +
-      '<button onclick="localStorage.setItem(\'zolotoy_stol_balance\',\'100000000\');sessionStorage.setItem(\'__dt_auto\',\'1\');location.reload();">+100M баланс</button>' +
-      '<button onclick="localStorage.setItem(\'zolotoy_stol_balance\',\'900000000000000\');sessionStorage.setItem(\'__dt_auto\',\'1\');location.reload();">+900T баланс</button>' +
-      '<button onclick="(function(){var c=JSON.parse(localStorage.getItem(\'zolotoy_stol_clicker\')||\'{}\');c.xp=999999;c.level=50;localStorage.setItem(\'zolotoy_stol_clicker\',JSON.stringify(c));sessionStorage.setItem(\'__dt_auto\',\'1\');location.reload();})()">Ур. 50</button>' +
-      '<button onclick="(function(){var c=JSON.parse(localStorage.getItem(\'zolotoy_stol_clicker\')||\'{}\');c.upgrades={power:100,gold:1,crit:3};localStorage.setItem(\'zolotoy_stol_clicker\',JSON.stringify(c));sessionStorage.setItem(\'__dt_auto\',\'1\');location.reload();})()">Max апгрейды</button>' +
-      '<button onclick="(function(){var c=JSON.parse(localStorage.getItem(\'zolotoy_stol_clicker\')||\'{}\');c.biz={kiosk:999,cafe:999,casinoB:999};localStorage.setItem(\'zolotoy_stol_clicker\',JSON.stringify(c));sessionStorage.setItem(\'__dt_auto\',\'1\');location.reload();})()">Max бизнесы</button>' +
-      '<button class="dark" onclick="(function(){var c=JSON.parse(localStorage.getItem(\'zolotoy_stol_clicker\')||\'{}\');c.ach={c100:1,c1000:1,c10000:1,c100000:1,c500000:1,c1m:1,e500:1,e5k:1,e50k:1,lvl5:1,lvl10:1,firstUp:1,crit:1,biz:1};localStorage.setItem(\'zolotoy_stol_clicker\',JSON.stringify(c));sessionStorage.setItem(\'__dt_auto\',\'1\');location.reload();})()">Все ачивки</button>' +
-      '<button class="danger" onclick="if(confirm(\'Сбросить ВСЁ?\')){localStorage.removeItem(\'zolotoy_stol_balance\');localStorage.removeItem(\'zolotoy_stol_clicker\');sessionStorage.setItem(\'__dt_auto\',\'1\');location.reload();}">Сброс</button>' +
+      '<button id="__dt_q1">+100M баланс</button>' +
+      '<button id="__dt_q2">+900T баланс</button>' +
+      '<button id="__dt_q3">Ур. 50</button>' +
+      '<button id="__dt_q4">Max апгрейды</button>' +
+      '<button id="__dt_q5">Max бизнесы</button>' +
+      '<button id="__dt_q6" class="dark">Все ачивки</button>' +
+      '<button id="__dt_q7" class="danger">Сброс</button>' +
       '</div></div>';
+
+    document.getElementById("__dt_run").onclick = function(){
+      try { eval(document.getElementById("__dt_console").value); }
+      catch(e){ alert("Error: " + e.message); }
+    };
+    function reload(){ sessionStorage.setItem("__dt_auto","1"); location.reload(); }
+    document.getElementById("__dt_q1").onclick = function(){ localStorage.setItem("zolotoy_stol_balance","100000000"); reload(); };
+    document.getElementById("__dt_q2").onclick = function(){ localStorage.setItem("zolotoy_stol_balance","900000000000000"); reload(); };
+    document.getElementById("__dt_q3").onclick = function(){ var c=JSON.parse(localStorage.getItem("zolotoy_stol_clicker")||"{}"); c.xp=999999; localStorage.setItem("zolotoy_stol_clicker",JSON.stringify(c)); reload(); };
+    document.getElementById("__dt_q4").onclick = function(){ var c=JSON.parse(localStorage.getItem("zolotoy_stol_clicker")||"{}"); c.upgrades={power:100,gold:1,crit:3}; localStorage.setItem("zolotoy_stol_clicker",JSON.stringify(c)); reload(); };
+    document.getElementById("__dt_q5").onclick = function(){ var c=JSON.parse(localStorage.getItem("zolotoy_stol_clicker")||"{}"); c.biz={kiosk:999,cafe:999,casinoB:999}; localStorage.setItem("zolotoy_stol_clicker",JSON.stringify(c)); reload(); };
+    document.getElementById("__dt_q6").onclick = function(){ var c=JSON.parse(localStorage.getItem("zolotoy_stol_clicker")||"{}"); c.ach={c100:1,c1000:1,c10000:1,c100000:1,c500000:1,c1m:1,e500:1,e5k:1,e50k:1,lvl5:1,lvl10:1,firstUp:1,crit:1,biz:1}; localStorage.setItem("zolotoy_stol_clicker",JSON.stringify(c)); reload(); };
+    document.getElementById("__dt_q7").onclick = function(){ if(confirm("Сбросить ВСЁ?")){ localStorage.removeItem("zolotoy_stol_balance"); localStorage.removeItem("zolotoy_stol_clicker"); reload(); } };
   }
 
   // ====== ВКЛАДКА БЫСТРО ======
   function renderQuick(){
     body.innerHTML =
       '<div class="__dt_section"><h4>🎛 Сменить ставку на 1 000 000</h4><div class="__dt_quick">' +
-      '<button onclick="document.querySelectorAll(\'[data-slotbet]\')[3].setAttribute(\'data-slotbet\',\'1000000\');document.querySelectorAll(\'[data-slotbet]\')[3].textContent=\'1M\';alert(\'Слоты OK\')">Слоты</button>' +
-      '<button onclick="document.querySelectorAll(\'[data-roubet]\')[3].setAttribute(\'data-roubet\',\'1000000\');document.querySelectorAll(\'[data-roubet]\')[3].textContent=\'1M\';alert(\'Рулетка OK\')">Рулетка</button>' +
-      '<button onclick="document.querySelectorAll(\'[data-bjbet]\')[3].setAttribute(\'data-bjbet\',\'1000000\');document.querySelectorAll(\'[data-bjbet]\')[3].textContent=\'1M\';alert(\'Блэкджек OK\')">Блэкджек</button>' +
+      '<button id="__dt_qs1">Слоты</button>' +
+      '<button id="__dt_qs2">Рулетка</button>' +
+      '<button id="__dt_qs3">Блэкджек</button>' +
       '</div></div>' +
       '<div class="__dt_section"><h4>🏷 Сменить название игры</h4>' +
-      '<div class="__dt_row"><input id="__dt_title" style="flex:1;background:#000;color:#0f0;border:1px solid #8a6f2a;border-radius:4px;padding:4px;font-size:11px;" placeholder="Новое название">' +
-      '<button onclick="var v=document.getElementById(\'__dt_title\').value;if(v)document.querySelectorAll(\'.brand-name,.game-title\').forEach(function(e){e.textContent=v;});">OK</button></div></div>';
+      '<div class="__dt_row"><input id="__dt_title" class="__dt_in" style="flex:1;" placeholder="Новое название">' +
+      '<button id="__dt_title_ok">OK</button></div></div>';
+    document.getElementById("__dt_qs1").onclick = function(){ var e=document.querySelectorAll("[data-slotbet]"); if(e[3]){e[3].setAttribute("data-slotbet","1000000");e[3].textContent="1M";} };
+    document.getElementById("__dt_qs2").onclick = function(){ var e=document.querySelectorAll("[data-roubet]"); if(e[3]){e[3].setAttribute("data-roubet","1000000");e[3].textContent="1M";} };
+    document.getElementById("__dt_qs3").onclick = function(){ var e=document.querySelectorAll("[data-bjbet]"); if(e[3]){e[3].setAttribute("data-bjbet","1000000");e[3].textContent="1M";} };
+    document.getElementById("__dt_title_ok").onclick = function(){
+      var v = document.getElementById("__dt_title").value;
+      if(!v) return;
+      document.querySelectorAll(".brand-name,.game-title").forEach(function(e){ e.textContent = v; });
+    };
   }
 
-  // ====== ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ======
   function setTab(name){
     q(".__dt_tab").forEach(function(x){ x.classList.toggle("active", x.dataset.tab === name); });
     if(name === "vars") renderVars();
