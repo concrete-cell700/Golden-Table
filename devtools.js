@@ -1,6 +1,7 @@
 (function(){
   "use strict";
-  if (window.__devtools) return;
+  if(window.__devtoolsLoaded) return;
+  window.__devtoolsLoaded = true;
 
   var css = document.createElement("style");
   css.textContent = `
@@ -30,18 +31,15 @@
   `;
   document.head.appendChild(css);
 
-  var LS_BAL = "zolotoy_stol_balance";
-  var LS_CLICK = "zolotoy_stol_clicker";
-
   var btn = document.createElement("button");
   btn.id = "__dt_btn";
-  btn.textContent = "⚙";
+  btn.innerHTML = "⚙";
   document.body.appendChild(btn);
 
   var panel = document.createElement("div");
   panel.id = "__dt_panel";
   panel.innerHTML =
-    '<div id="__dt_head"><b>DEVTOOLS</b><button id="__dt_close">✕</button></div>' +
+    '<div id="__dt_head"><b>⚙ DEVTOOLS</b><button id="__dt_close">✕</button></div>' +
     '<div id="__dt_tabs">' +
       '<div class="__dt_tab active" data-tab="vars">Переменные</div>' +
       '<div class="__dt_tab" data-tab="dom">DOM</div>' +
@@ -52,300 +50,126 @@
   document.body.appendChild(panel);
 
   var body = document.getElementById("__dt_body");
-
   function q(sel){ return document.querySelectorAll(sel); }
+  function readLS(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
 
-  function lsGet(key){ return localStorage.getItem(key); }
-  function lsSet(key, val){ localStorage.setItem(key, String(val)); }
-
-  function clickerGet(){
-    try {
-      var raw = localStorage.getItem(LS_CLICK);
-      return raw ? JSON.parse(raw) : {};
-    } catch(e){ return {}; }
-  }
-  function clickerSet(obj){ localStorage.setItem(LS_CLICK, JSON.stringify(obj)); }
-
-  function clickerEdit(field, promptLabel){
-    var v = prompt(promptLabel, "");
-    if (v === null) return;
-    var obj = clickerGet();
-    obj[field] = v;
-    clickerSet(obj);
-    setTab("vars");
-  }
-
-  function clickerEditJSON(field, promptLabel){
-    var obj = clickerGet();
-    var v = prompt(promptLabel, JSON.stringify(obj[field] || {}));
-    if (v === null) return;
-    try {
-      obj[field] = JSON.parse(v);
-    } catch(e){ alert("Bad JSON"); return; }
-    clickerSet(obj);
-    setTab("vars");
-  }
-
-  function updateBalanceUI(val){
-    var el = document.getElementById("balanceDisplay");
-    if (!el) return;
-    var n = parseFloat(val);
-    el.textContent = isNaN(n)
-      ? String(val)
-      : n.toLocaleString("ru-RU", {minimumFractionDigits:1, maximumFractionDigits:1});
-  }
-
-  function row(label, value, act){
-    var shown = (value === null || value === undefined || value === "") ? "—" : String(value);
-    return '<div class="__dt_row"><span class="k">' + label + '</span>' +
-           '<span class="v">' + shown + '</span>' +
-           '<button data-act="' + act + '">✏</button></div>';
-  }
-
+  // ========== ВКЛАДКА: ПЕРЕМЕННЫЕ (как кнопки в консоли — setItem + reload) ==========
   function renderVars(){
-    var c = clickerGet();
     var h = "";
-    h += '<div class="__dt_section"><h4>Баланс</h4>';
-    h += row("balance", lsGet(LS_BAL), "v-bal");
+    h += '<div class="__dt_section"><h4>💰 Баланс</h4>';
+    h += '<div class="__dt_row"><span class="k">balance</span><span class="v">' + (readLS("zolotoy_stol_balance")||"—") + '</span>' +
+         '<button onclick="var v=prompt(\'Баланс:\',localStorage.getItem(\'zolotoy_stol_balance\'));if(v!==null){localStorage.setItem(\'zolotoy_stol_balance\',v);location.reload();}">✏</button></div>';
     h += '</div>';
-    h += '<div class="__dt_section"><h4>Кликер</h4>';
-    h += row("totalClicks", c.totalClicks, "v-clicks");
-    h += row("totalEarned", c.totalEarned, "v-earned");
-    h += row("xp", c.xp, "v-xp");
-    h += row("level", c.level, "v-level");
-    h += row("skin", c.skin, "v-skin");
-    h += row("upgBought", c.upgBought, "v-upgbought");
-    h += row("bizOwned", c.bizOwned, "v-bizowned");
-    h += row("upgrades", JSON.stringify(c.upgrades || {}), "v-upgrades");
-    h += row("biz", JSON.stringify(c.biz || {}), "v-biz");
-    h += row("ach", Object.keys(c.ach || {}).length + " шт.", "v-ach");
+
+    var c = {};
+    try { c = JSON.parse(readLS("zolotoy_stol_clicker")||"{}") || {}; } catch(e){}
+
+    h += '<div class="__dt_section"><h4>👆 Кликер</h4>';
+    h += '<div class="__dt_row"><span class="k">totalClicks</span><span class="v">' + (c.totalClicks!==undefined?c.totalClicks:"—") + '</span>' +
+         '<button onclick="var v=prompt(\'totalClicks:\',\'\');if(v===null)return;var c=JSON.parse(localStorage.getItem(\'zolotoy_stol_clicker\')||\'{}\');c.totalClicks=v;localStorage.setItem(\'zolotoy_stol_clicker\',JSON.stringify(c));location.reload();">✏</button></div>';
+    h += '<div class="__dt_row"><span class="k">totalEarned</span><span class="v">' + (c.totalEarned!==undefined?c.totalEarned:"—") + '</span>' +
+         '<button onclick="var v=prompt(\'totalEarned:\',\'\');if(v===null)return;var c=JSON.parse(localStorage.getItem(\'zolotoy_stol_clicker\')||\'{}\');c.totalEarned=v;localStorage.setItem(\'zolotoy_stol_clicker\',JSON.stringify(c));location.reload();">✏</button></div>';
+    h += '<div class="__dt_row"><span class="k">xp</span><span class="v">' + (c.xp!==undefined?c.xp:"—") + '</span>' +
+         '<button onclick="var v=prompt(\'xp:\',\'\');if(v===null)return;var c=JSON.parse(localStorage.getItem(\'zolotoy_stol_clicker\')||\'{}\');c.xp=v;localStorage.setItem(\'zolotoy_stol_clicker\',JSON.stringify(c));location.reload();">✏</button></div>';
+    h += '<div class="__dt_row"><span class="k">level</span><span class="v">' + (c.level!==undefined?c.level:"—") + '</span>' +
+         '<button onclick="var v=prompt(\'level:\',\'\');if(v===null)return;var c=JSON.parse(localStorage.getItem(\'zolotoy_stol_clicker\')||\'{}\');c.level=v;localStorage.setItem(\'zolotoy_stol_clicker\',JSON.stringify(c));location.reload();">✏</button></div>';
+    h += '<div class="__dt_row"><span class="k">skin</span><span class="v">' + (c.skin!==undefined?c.skin:"—") + '</span>' +
+         '<button onclick="var v=prompt(\'skin:\',\'\');if(v===null)return;var c=JSON.parse(localStorage.getItem(\'zolotoy_stol_clicker\')||\'{}\');c.skin=v;localStorage.setItem(\'zolotoy_stol_clicker\',JSON.stringify(c));location.reload();">✏</button></div>';
+    h += '<div class="__dt_row"><span class="k">upgBought</span><span class="v">' + (c.upgBought!==undefined?c.upgBought:"—") + '</span>' +
+         '<button onclick="var v=prompt(\'upgBought:\',\'\');if(v===null)return;var c=JSON.parse(localStorage.getItem(\'zolotoy_stol_clicker\')||\'{}\');c.upgBought=v;localStorage.setItem(\'zolotoy_stol_clicker\',JSON.stringify(c));location.reload();">✏</button></div>';
+    h += '<div class="__dt_row"><span class="k">bizOwned</span><span class="v">' + (c.bizOwned!==undefined?c.bizOwned:"—") + '</span>' +
+         '<button onclick="var v=prompt(\'bizOwned:\',\'\');if(v===null)return;var c=JSON.parse(localStorage.getItem(\'zolotoy_stol_clicker\')||\'{}\');c.bizOwned=v;localStorage.setItem(\'zolotoy_stol_clicker\',JSON.stringify(c));location.reload();">✏</button></div>';
+    h += '<div class="__dt_row"><span class="k">upgrades</span><span class="v">' + JSON.stringify(c.upgrades||{}) + '</span>' +
+         '<button onclick="var v=prompt(\'upgrades (JSON):\',JSON.stringify(JSON.parse(localStorage.getItem(\'zolotoy_stol_clicker\')||\'{}\').upgrades||{}));if(v===null)return;var c=JSON.parse(localStorage.getItem(\'zolotoy_stol_clicker\')||\'{}\');try{c.upgrades=JSON.parse(v);localStorage.setItem(\'zolotoy_stol_clicker\',JSON.stringify(c));location.reload();}catch(e){alert(\'Bad JSON\')}">✏</button></div>';
+    h += '<div class="__dt_row"><span class="k">biz</span><span class="v">' + JSON.stringify(c.biz||{}) + '</span>' +
+         '<button onclick="var v=prompt(\'biz (JSON):\',JSON.stringify(JSON.parse(localStorage.getItem(\'zolotoy_stol_clicker\')||\'{}\').biz||{}));if(v===null)return;var c=JSON.parse(localStorage.getItem(\'zolotoy_stol_clicker\')||\'{}\');try{c.biz=JSON.parse(v);localStorage.setItem(\'zolotoy_stol_clicker\',JSON.stringify(c));location.reload();}catch(e){alert(\'Bad JSON\')}">✏</button></div>';
+    h += '<div class="__dt_row"><span class="k">ach</span><span class="v">' + Object.keys(c.ach||{}).length + ' шт.</span>' +
+         '<button onclick="var v=prompt(\'ach (JSON):\',JSON.stringify(JSON.parse(localStorage.getItem(\'zolotoy_stol_clicker\')||\'{}\').ach||{}));if(v===null)return;var c=JSON.parse(localStorage.getItem(\'zolotoy_stol_clicker\')||\'{}\');try{c.ach=JSON.parse(v);localStorage.setItem(\'zolotoy_stol_clicker\',JSON.stringify(c));location.reload();}catch(e){alert(\'Bad JSON\')}">✏</button></div>';
     h += '</div>';
     body.innerHTML = h;
   }
 
+  // ========== ВКЛАДКА: DOM ==========
   function renderDom(){
-    var h = '<div class="__dt_section"><h4>Ставки</h4>';
+    var h = '<div class="__dt_section"><h4>🎛 Ставки (data-атрибуты)</h4>';
     ["slotbet","roubet","bjbet"].forEach(function(a){
       h += '<div style="font-size:11px;color:#b7ac93;margin:6px 0 3px;">data-' + a + '</div>';
-      q("[data-" + a + "]").forEach(function(el, i){
-        h += '<div class="__dt_row"><span class="k">#' + i + ' [' + el.textContent + ']</span>' +
-             '<span class="v">' + el.getAttribute("data-" + a) + '</span>' +
-             '<button data-act="set-attr" data-attr="' + a + '" data-idx="' + i + '">✏</button></div>';
+      q("[data-"+a+"]").forEach(function(el,i){
+        h += '<div class="__dt_row"><span class="k">#'+i+' ['+el.textContent+']</span><span class="v">'+el.getAttribute("data-"+a)+'</span>' +
+             '<button onclick="(function(){var v=prompt(\'Номинал:\',\'' + el.getAttribute("data-"+a) + '\');if(v===null)return;var els=document.querySelectorAll(\'[data-'+a+']\');els['+i+'].setAttribute(\'data-'+a+'\',v);els['+i+'].textContent=v;})()">✏</button></div>';
       });
     });
     h += '</div>';
-    h += '<div class="__dt_section"><h4>Любой элемент</h4>' +
-         '<div class="__dt_row"><span class="k">CSS</span><input id="__dt_sel" style="flex:1;background:#000;color:#0f0;border:1px solid #8a6f2a;border-radius:4px;padding:4px;font-size:11px;" placeholder=".num-cell"></div>' +
-         '<div class="__dt_row"><button data-act="edit-html">innerHTML</button>' +
-         '<button data-act="edit-value">value</button>' +
-         '<button class="danger" data-act="del-el">Удалить</button></div></div>';
+    h += '<div class="__dt_section"><h4>🎯 Все чипы</h4>';
+    q(".chip-btn").forEach(function(el,i){
+      h += '<div class="__dt_row"><span class="k">chip#'+i+'</span><span class="v">'+el.textContent+'</span>' +
+           '<button onclick="(function(){var v=prompt(\'Текст:\',\'' + el.textContent + '\');if(v!==null)document.querySelectorAll(\'.chip-btn\')['+i+'].textContent=v;})()">✏</button></div>';
+    });
+    h += '</div>';
+    h += '<div class="__dt_section"><h4>🔎 Любой элемент</h4>' +
+         '<div class="__dt_row"><span class="k">CSS-селектор</span><input id="__dt_sel" style="flex:1;background:#000;color:#0f0;border:1px solid #8a6f2a;border-radius:4px;padding:4px;font-size:11px;" placeholder=".num-cell"></div>' +
+         '<div class="__dt_row"><button onclick="(function(){var s=document.getElementById(\'__dt_sel\').value;var el=document.querySelector(s);if(!el){alert(\'Не найдено\');return;}var v=prompt(\'innerHTML:\',el.innerHTML);if(v!==null)el.innerHTML=v;})()">✏ innerHTML</button>' +
+         '<button onclick="(function(){var s=document.getElementById(\'__dt_sel\').value;var el=document.querySelector(s);if(!el){alert(\'Не найдено\');return;}var v=prompt(\'value:\',el.value||\'\');if(v!==null)el.value=v;})()">✏ value</button>' +
+         '<button class="danger" onclick="(function(){var s=document.getElementById(\'__dt_sel\').value;document.querySelectorAll(s).forEach(function(e){e.remove();});})()">🗑 Удалить</button></div></div>';
     body.innerHTML = h;
   }
 
+  // ========== ВКЛАДКА: КОНСОЛЬ ==========
   function renderConsole(){
     body.innerHTML =
-      '<div class="__dt_section"><h4>JS-консоль</h4>' +
+      '<div class="__dt_section"><h4>⚡ JS-консоль</h4>' +
       '<textarea id="__dt_console" placeholder="// любой код"></textarea>' +
-      '<button class="__dt_quick" style="margin-top:8px;width:100%;padding:9px;" data-act="run-js">Выполнить</button></div>' +
-      '<div class="__dt_section"><h4>Быстрые команды</h4><div class="__dt_quick">' +
-      '<button data-act="q-bal">+9.9M баланс</button>' +
-      '<button data-act="q-bal900">+900T баланс</button>' +
-      '<button data-act="q-lvl">Ур. 50</button>' +
-      '<button data-act="q-upg">Max апгрейды</button>' +
-      '<button data-act="q-biz">Max бизнесы</button>' +
-      '<button class="dark" data-act="q-ach">Все ачивки</button>' +
-      '<button class="dark" data-act="bet-all">Ставки 1M</button>' +
-      '<button class="danger" data-act="q-reset">Сброс</button>' +
+      '<button class="__dt_quick" style="margin-top:8px;width:100%;padding:9px;background:linear-gradient(180deg,#f2cf7e,#d4af37);border:none;border-radius:6px;color:#2a1e05;font-weight:bold;cursor:pointer;" onclick="(function(){try{eval(document.getElementById(\'__dt_console\').value);}catch(e){alert(\'Error: \'+e.message)}})()">▶ Выполнить</button></div>' +
+      '<div class="__dt_section"><h4>📋 Быстрые команды</h4><div class="__dt_quick">' +
+      '<button onclick="localStorage.setItem(\'zolotoy_stol_balance\',\'9999999\');location.reload();">+9.9M баланс</button>' +
+      '<button onclick="localStorage.setItem(\'zolotoy_stol_balance\',\'900000000000000\');location.reload();">+900T баланс</button>' +
+      '<button onclick="(function(){var c=JSON.parse(localStorage.getItem(\'zolotoy_stol_clicker\')||\'{}\');c.xp=999999;c.level=50;localStorage.setItem(\'zolotoy_stol_clicker\',JSON.stringify(c));location.reload();})()">Ур. 50</button>' +
+      '<button onclick="(function(){var c=JSON.parse(localStorage.getItem(\'zolotoy_stol_clicker\')||\'{}\');c.upgrades={power:100,gold:1,crit:3};localStorage.setItem(\'zolotoy_stol_clicker\',JSON.stringify(c));location.reload();})()">Max апгрейды</button>' +
+      '<button onclick="(function(){var c=JSON.parse(localStorage.getItem(\'zolotoy_stol_clicker\')||\'{}\');c.biz={kiosk:999,cafe:999,casinoB:999};localStorage.setItem(\'zolotoy_stol_clicker\',JSON.stringify(c));location.reload();})()">Max бизнесы</button>' +
+      '<button class="dark" onclick="(function(){var s=JSON.parse(localStorage.getItem(\'zolotoy_stol_clicker\')||\'{}\');s.ach={c100:1,c1000:1,c10000:1,c100000:1,c500000:1,c1m:1,e500:1,e5k:1,e50k:1,lvl5:1,lvl10:1,firstUp:1,crit:1,biz:1};localStorage.setItem(\'zolotoy_stol_clicker\',JSON.stringify(s));location.reload();})()">Все ачивки</button>' +
+      '<button class="danger" onclick="if(confirm(\'Сбросить ВСЁ?\')){localStorage.removeItem(\'zolotoy_stol_balance\');localStorage.removeItem(\'zolotoy_stol_clicker\');location.reload();}">Сброс</button>' +
       '</div></div>';
   }
 
+  // ========== ВКЛАДКА: БЫСТРО ==========
   function renderQuick(){
     body.innerHTML =
-      '<div class="__dt_section"><h4>Сменить номинал</h4><div class="__dt_quick">' +
-      '<button data-act="bet-slots">Слоты 1M</button>' +
-      '<button data-act="bet-rou">Рулетка 1M</button>' +
-      '<button data-act="bet-bj">Блэкджек 1M</button>' +
-      '<button data-act="bet-all">Все 1M</button>' +
+      '<div class="__dt_section"><h4>🎛 Сменить ставку на 1 000 000</h4><div class="__dt_quick">' +
+      '<button onclick="document.querySelectorAll(\'[data-slotbet]\')[3].setAttribute(\'data-slotbet\',\'1000000\');document.querySelectorAll(\'[data-slotbet]\')[3].textContent=\'1M\';alert(\'Слоты OK\')">Слоты</button>' +
+      '<button onclick="document.querySelectorAll(\'[data-roubet]\')[3].setAttribute(\'data-roubet\',\'1000000\');document.querySelectorAll(\'[data-roubet]\')[3].textContent=\'1M\';alert(\'Рулетка OK\')">Рулетка</button>' +
+      '<button onclick="document.querySelectorAll(\'[data-bjbet]\')[3].setAttribute(\'data-bjbet\',\'1000000\');document.querySelectorAll(\'[data-bjbet]\')[3].textContent=\'1M\';alert(\'Блэкджек OK\')">Блэкджек</button>' +
       '</div></div>' +
-      '<div class="__dt_section"><h4>Название игры</h4>' +
+      '<div class="__dt_section"><h4>🏷 Сменить название игры</h4>' +
       '<div class="__dt_row"><input id="__dt_title" style="flex:1;background:#000;color:#0f0;border:1px solid #8a6f2a;border-radius:4px;padding:4px;font-size:11px;" placeholder="Новое название">' +
-      '<button data-act="set-title">OK</button></div></div>';
+      '<button onclick="var v=document.getElementById(\'__dt_title\').value;if(v)document.querySelectorAll(\'.brand-name,.game-title\').forEach(function(e){e.textContent=v;});">OK</button></div></div>';
   }
-
-  function setBet(attr, label){
-    var els = q("[data-" + attr + "]");
-    if (!els.length) return;
-    var last = els[els.length - 1];
-    last.setAttribute("data-" + attr, "1000000");
-    last.textContent = label;
-  }
-
-  body.addEventListener("click", function(e){
-    var t = e.target.closest("[data-act]");
-    if (!t) return;
-    var act = t.dataset.act;
-    var v;
-
-    switch (act) {
-      case "v-bal":
-        v = prompt("Баланс:", lsGet(LS_BAL) || "1000000");
-        if (v === null) return;
-        lsSet(LS_BAL, v);
-        updateBalanceUI(v);
-        setTab("vars");
-        return;
-
-      case "v-clicks":    clickerEdit("totalClicks", "totalClicks:");    return;
-      case "v-earned":    clickerEdit("totalEarned", "totalEarned:");    return;
-      case "v-xp":        clickerEdit("xp", "xp:");                      return;
-      case "v-level":     clickerEdit("level", "level:");                return;
-      case "v-skin":      clickerEdit("skin", "skin:");                  return;
-      case "v-upgbought": clickerEdit("upgBought", "upgBought:");        return;
-      case "v-bizowned":  clickerEdit("bizOwned", "bizOwned:");          return;
-
-      case "v-upgrades": clickerEditJSON("upgrades", "upgrades (JSON):"); return;
-      case "v-biz":      clickerEditJSON("biz", "biz (JSON):");           return;
-      case "v-ach":      clickerEditJSON("ach", "ach (JSON):");           return;
-
-      case "set-attr": {
-        var attr = t.dataset.attr;
-        var idx = parseInt(t.dataset.idx, 10);
-        var el = q("[data-" + attr + "]")[idx];
-        if (!el) return;
-        v = prompt("Значение:", el.getAttribute("data-" + attr));
-        if (v === null) return;
-        el.setAttribute("data-" + attr, v);
-        el.textContent = v;
-        return;
-      }
-
-      case "edit-html": {
-        var s = document.getElementById("__dt_sel").value;
-        var e1 = document.querySelector(s);
-        if (!e1) { alert("Не найдено"); return; }
-        v = prompt("innerHTML:", e1.innerHTML);
-        if (v !== null) e1.innerHTML = v;
-        return;
-      }
-
-      case "edit-value": {
-        var s2 = document.getElementById("__dt_sel").value;
-        var e2 = document.querySelector(s2);
-        if (!e2) { alert("Не найдено"); return; }
-        v = prompt("value:", e2.value || "");
-        if (v !== null) e2.value = v;
-        return;
-      }
-
-      case "del-el": {
-        var s3 = document.getElementById("__dt_sel").value;
-        q(s3).forEach(function(el){ el.remove(); });
-        return;
-      }
-
-      case "run-js":
-        try {
-          eval(document.getElementById("__dt_console").value);
-        } catch(err){
-          alert("Error: " + err.message);
-        }
-        return;
-
-      case "q-bal":
-        lsSet(LS_BAL, "9900000");
-        updateBalanceUI("9900000");
-        return;
-
-      case "q-bal900":
-        lsSet(LS_BAL, "900000000000000");
-        updateBalanceUI("900000000000000");
-        return;
-
-      case "q-lvl": {
-        var cl = clickerGet();
-        cl.xp = 999999;
-        cl.level = 50;
-        clickerSet(cl);
-        return;
-      }
-
-      case "q-upg": {
-        var cu = clickerGet();
-        cu.upgrades = {power:100, gold:1, crit:3};
-        clickerSet(cu);
-        return;
-      }
-
-      case "q-biz": {
-        var cb = clickerGet();
-        cb.biz = {kiosk:999, cafe:999, casinoB:999};
-        clickerSet(cb);
-        return;
-      }
-
-      case "q-ach": {
-        var ca = clickerGet();
-        ca.ach = {
-          c100:1, c1000:1, c10000:1, c100000:1, c500000:1, c1m:1,
-          e500:1, e5k:1, e50k:1,
-          lvl5:1, lvl10:1, firstUp:1, crit:1, biz:1
-        };
-        clickerSet(ca);
-        return;
-      }
-
-      case "q-reset":
-        if (confirm("Сбросить всё?")) {
-          localStorage.removeItem(LS_BAL);
-          localStorage.removeItem(LS_CLICK);
-          location.reload();
-        }
-        return;
-
-      case "bet-slots": setBet("slotbet", "1M"); return;
-      case "bet-rou":   setBet("roubet",   "1M"); return;
-      case "bet-bj":    setBet("bjbet",    "1M"); return;
-
-      case "bet-all":
-        setBet("slotbet", "1M");
-        setBet("roubet",   "1M");
-        setBet("bjbet",    "1M");
-        return;
-
-      case "set-title": {
-        var nv = document.getElementById("__dt_title").value;
-        if (nv) q(".brand-name,.game-title").forEach(function(el){ el.textContent = nv; });
-        return;
-      }
-    }
-  });
 
   function setTab(name){
-    q(".__dt_tab").forEach(function(x){
-      x.classList.toggle("active", x.dataset.tab === name);
-    });
-    if (name === "vars") renderVars();
-    else if (name === "dom") renderDom();
-    else if (name === "console") renderConsole();
-    else if (name === "quick") renderQuick();
+    document.querySelectorAll(".__dt_tab").forEach(function(x){ x.classList.toggle("active", x.dataset.tab === name); });
+    if(name === "vars") renderVars();
+    else if(name === "dom") renderDom();
+    else if(name === "console") renderConsole();
+    else if(name === "quick") renderQuick();
   }
 
-  q(".__dt_tab").forEach(function(tab){
-    tab.addEventListener("click", function(){ setTab(tab.dataset.tab); });
+  document.querySelectorAll(".__dt_tab").forEach(function(tab){
+    tab.onclick = function(){ setTab(tab.dataset.tab); };
   });
-
-  document.getElementById("__dt_close").addEventListener("click", function(){
-    panel.classList.remove("open");
-  });
-
-  btn.addEventListener("click", function(){
+  document.getElementById("__dt_close").onclick = function(){ panel.classList.remove("open"); };
+  btn.onclick = function(){
     panel.classList.toggle("open");
-    if (panel.classList.contains("open")) setTab("vars");
-  });
-
-  window.__devtools = {
-    toggle: function(){ btn.click(); }
+    if(panel.classList.contains("open")) setTab("vars");
   };
 
+  window.__devtools = { toggle: function(){ btn.onclick(); } };
   setTab("vars");
+})();
+
+/* ===== АВТОЗАГРУЗКА ПОСЛЕ RELOAD ===== */
+(function(){
+  if(sessionStorage.getItem('__dt_auto') === '1' && !document.getElementById('__dt_btn')){
+    var s = document.createElement('script');
+    s.src = 'https://concrete-cell700.github.io/Golden-Table/devtools.js?v=' + Date.now();
+    document.body.appendChild(s);
+  }
 })();
