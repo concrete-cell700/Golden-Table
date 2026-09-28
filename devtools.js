@@ -55,57 +55,50 @@
   `;
   document.head.appendChild(css);
 
-  // ========== ЗАГРУЗКА СОХРАНЁННЫХ СТИЛЕЙ ==========
+  // ========== ЗАГРУЗКА / СОХРАНЕНИЕ ==========
   function loadSavedStyles(){
     try { return JSON.parse(localStorage.getItem(STYLE_KEY) || "{}") || {}; } catch(e){ return {}; }
   }
   function saveSavedStyles(obj){
     try { localStorage.setItem(STYLE_KEY, JSON.stringify(obj)); } catch(e){}
   }
+
+  // ========== ФИКС: очистка селектора ==========
+  function cleanSelector(sel){
+    if(!sel) return "body";
+    var s = String(sel).trim();
+    // убираем висящие комбинаторы
+    s = s.replace(/\s*[>+~]\s*$/, "").trim();
+    // "body >" → "body"
+    if(s === "body >" || s === "body" || s === "" || s === ">") return "body";
+    if(s === "html >" || s === "html") return "html";
+    return s;
+  }
+
+  // ========== ПРИМЕНЕНИЕ СОХРАНЁННЫХ ==========
   function applySavedStyles(){
     var saved = loadSavedStyles();
-    Object.keys(saved).forEach(function(sel){
+    var ok = 0, fail = 0;
+    Object.keys(saved).forEach(function(rawSel){
       try {
+        var sel = cleanSelector(rawSel);
         var el = document.querySelector(sel);
-        if(!el) return;
-        var s = saved[sel];
+        if(!el){ fail++; return; }
+        var s = saved[rawSel];
         if(s.html !== undefined) el.innerHTML = s.html;
         if(s.className !== undefined) el.className = s.className;
         if(s.styles) Object.keys(s.styles).forEach(function(p){ try { el.style[p] = s.styles[p]; } catch(e){} });
         if(s.attrs) Object.keys(s.attrs).forEach(function(a){ try { el.setAttribute(a, s.attrs[a]); } catch(e){} });
-      } catch(e){}
+        ok++;
+      } catch(e){ fail++; }
     });
+    return { ok: ok, fail: fail };
   }
-  applySavedStyles();
-
-  function makeSelector(el){
-    if(!el || !el.tagName) return null;
-    if(el.id) return "#" + el.id;
-    var attrs = el.attributes;
-    for(var i=0;i<attrs.length;i++){
-      var a = attrs[i];
-      if(a.name.indexOf("data-") === 0){
-        var s = el.tagName.toLowerCase() + "[" + a.name + '="' + a.value + '"]';
-        try { if(document.querySelectorAll(s).length === 1) return s; } catch(e){}
-      }
-    }
-    var path = [], cur = el;
-    while(cur && cur !== document.body && cur.nodeType === 1){
-      var tag = cur.tagName.toLowerCase();
-      var parent = cur.parentElement;
-      if(!parent){ path.unshift(tag); break; }
-      var idx = 1, sib = cur;
-      while(sib.previousElementSibling){
-        sib = sib.previousElementSibling;
-        if(sib.tagName === cur.tagName) idx++;
-      }
-      path.unshift(tag + ":nth-of-type(" + idx + ")");
-      cur = parent;
-    }
-    return "body > " + path.join(" > ");
-  }
+  // экспорт для повторного вызова
+  window.__dtApply = applySavedStyles;
 
   function recordChange(sel, key, value){
+    if(!sel){ alert("recordChange: пустой селектор"); return; }
     var s = loadSavedStyles();
     if(!s[sel]) s[sel] = {};
     if(key === "style"){
@@ -127,6 +120,26 @@
   function clearAll(){
     localStorage.removeItem(STYLE_KEY);
   }
+
+  // ========== ПРИМЕНЕНИЕ ПРИ СТАРТЕ + АВТО-ПОВТОР ==========
+  (function(){
+    // сразу
+    var r = applySavedStyles();
+    // если есть что применять — показываем тост
+    if(r.ok > 0 || r.fail > 0){
+      var t = document.createElement("div");
+      t.textContent = "💾 Применено: " + r.ok + ", не найдено: " + r.fail;
+      t.style.cssText = "position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#0d1f17;border:1px solid #d4af37;color:#f2cf7e;padding:8px 16px;border-radius:8px;z-index:100001;font-size:11px;font-family:Georgia,serif;";
+      document.body.appendChild(t);
+      setTimeout(function(){ t.remove(); }, 3000);
+    }
+    // повторно несколько раз (на случай, если элементы создаются позже)
+    [300, 800, 1500, 3000, 5000].forEach(function(ms){
+      setTimeout(function(){ applySavedStyles(); }, ms);
+    });
+    // и каждые 3 секунды постоянно
+    setInterval(function(){ applySavedStyles(); }, 3000);
+  })();
 
   // ========== КНОПКА И ПАНЕЛЬ ==========
   var btn = document.createElement("button");
@@ -177,6 +190,38 @@
     return "#" + [m[0],m[1],m[2]].map(function(x){ var h = parseInt(x).toString(16); return h.length === 1 ? "0" + h : h; }).join("");
   }
 
+  // ========== СЕЛЕКТОР ==========
+  function makeSelector(el){
+    if(!el || !el.tagName) return null;
+    if(el === document.body) return "body";
+    if(el === document.documentElement) return "html";
+    if(el.id) return "#" + el.id;
+    var attrs = el.attributes;
+    for(var i=0;i<attrs.length;i++){
+      var a = attrs[i];
+      if(a.name.indexOf("data-") === 0){
+        var s = el.tagName.toLowerCase() + "[" + a.name + '="' + a.value + '"]';
+        try { if(document.querySelectorAll(s).length === 1) return s; } catch(e){}
+      }
+    }
+    var path = [], cur = el;
+    while(cur && cur !== document.body && cur.nodeType === 1){
+      var tag = cur.tagName.toLowerCase();
+      var parent = cur.parentElement;
+      if(!parent) break;
+      var idx = 1, sib = cur;
+      while(sib.previousElementSibling){
+        sib = sib.previousElementSibling;
+        if(sib.tagName === cur.tagName) idx++;
+      }
+      path.unshift(tag + ":nth-of-type(" + idx + ")");
+      cur = parent;
+    }
+    var result = "body > " + path.join(" > ");
+    result = result.replace(/\s*>\s*$/, "").trim();
+    return result;
+  }
+
   // ========== ИНСПЕКТОР ==========
   var inspectMode = false, selectedEl = null;
 
@@ -210,14 +255,14 @@
     var h = '<div class="__dt_section"><h4>🎯 Инспектор</h4><button class="__dt_quick" id="__dt_pick" style="width:100%;padding:10px;background:linear-gradient(180deg,#f2cf7e,#d4af37);border:none;border-radius:6px;color:#2a1e05;font-weight:bold;cursor:pointer;">🎯 Выбрать элемент</button></div>';
 
     if(savedCount > 0){
-      h += '<div class="__dt_section"><h4>💾 Сохранено: ' + savedCount + '</h4><div class="__dt_quick"><button class="danger" id="__dt_clear_all">🗑 Сбросить все сохранения</button></div></div>';
+      h += '<div class="__dt_section"><h4>💾 Сохранено: ' + savedCount + '</h4><div class="__dt_quick"><button class="danger" id="__dt_clear_all">🗑 Сбросить все</button></div></div>';
     }
 
     if(!selectedEl){
-      h += '<div style="color:#b7ac93;font-size:11px;text-align:center;padding:20px;">Тапни «Выбрать элемент», потом тапни по элементу на странице</div>';
+      h += '<div style="color:#b7ac93;font-size:11px;text-align:center;padding:20px;">Тапни «Выбрать элемент», потом тапни по элементу</div>';
       body.innerHTML = h;
       document.getElementById("__dt_pick").onclick = function(){ panel.classList.remove("open"); startInspect(); };
-      if(savedCount > 0) document.getElementById("__dt_clear_all").onclick = function(){ if(confirm("Удалить все сохранённые изменения?")){ clearAll(); location.reload(); } };
+      if(savedCount > 0) document.getElementById("__dt_clear_all").onclick = function(){ if(confirm("Удалить все сохранения?")){ clearAll(); location.reload(); } };
       return;
     }
 
@@ -266,12 +311,11 @@
 
     body.innerHTML = h;
 
-    // обработчики
     document.getElementById("__dt_pick").onclick = function(){ panel.classList.remove("open"); startInspect(); };
     document.getElementById("__dt_pick2").onclick = function(){ panel.classList.remove("open"); startInspect(); };
     document.getElementById("__dt_parent").onclick = function(){ if(selectedEl && selectedEl.parentElement){ selectedEl = selectedEl.parentElement; renderDomInspector(); } };
     document.getElementById("__dt_remove").onclick = function(){ if(!selectedEl) return; if(!confirm("Удалить элемент?")) return; selectedEl.remove(); selectedEl = null; renderDomInspector(); };
-    if(wasSaved) document.getElementById("__dt_reset_el").onclick = function(){ if(!confirm("Сбросить изменения?")) return; removeChange(sel); location.reload(); };
+    if(wasSaved) document.getElementById("__dt_reset_el").onclick = function(){ if(!confirm("Сбросить?")) return; removeChange(sel); location.reload(); };
 
     document.getElementById("__dt_apply_html").onclick = function(){
       var v = document.getElementById("__dt_html").value;
@@ -446,13 +490,29 @@
     body.innerHTML =
       '<div class="__dt_section"><h4>🎛 Номиналы 1M</h4><div class="__dt_quick"><button id="__dt_qs1">Слоты</button><button id="__dt_qs2">Рулетка</button><button id="__dt_qs3">Блэкджек</button><button id="__dt_qs4">Все</button></div></div>' +
       '<div class="__dt_section"><h4>🏷 Название игры</h4><div class="__dt_row"><input id="__dt_title" class="__dt_in" style="flex:1;" placeholder="Новое название"><button id="__dt_title_ok">OK</button></div></div>' +
+      '<div class="__dt_section"><h4>💾 Сохранённые стили</h4><div class="__dt_quick"><button id="__dt_count_styles">📋 Сколько сохранено</button><button id="__dt_reapply">🔄 Применить сейчас</button></div></div>' +
       '<div class="__dt_section"><h4>🧹 Сброс</h4><div class="__dt_quick"><button class="danger" id="__dt_clear_styles">🗑 Сбросить CSS-изменения</button></div></div>';
     document.getElementById("__dt_qs1").onclick = function(){ var e=q("[data-slotbet]"); if(e[3]){e[3].setAttribute("data-slotbet","1000000");e[3].textContent="1M";} };
     document.getElementById("__dt_qs2").onclick = function(){ var e=q("[data-roubet]"); if(e[3]){e[3].setAttribute("data-roubet","1000000");e[3].textContent="1M";} };
     document.getElementById("__dt_qs3").onclick = function(){ var e=q("[data-bjbet]"); if(e[3]){e[3].setAttribute("data-bjbet","1000000");e[3].textContent="1M";} };
     document.getElementById("__dt_qs4").onclick = function(){ ['slotbet','roubet','bjbet'].forEach(function(a){var e=q("[data-"+a+"]");if(e[3]){e[3].setAttribute("data-"+a,"1000000");e[3].textContent="1M";}}); };
     document.getElementById("__dt_title_ok").onclick = function(){ var v = document.getElementById("__dt_title").value; if(!v) return; q(".brand-name,.game-title").forEach(function(e){ e.textContent = v; }); };
-    document.getElementById("__dt_clear_styles").onclick = function(){ if(confirm("Сбросить все сохранённые CSS-изменения?")){ clearAll(); location.reload(); } };
+
+    document.getElementById("__dt_count_styles").onclick = function(){
+      var raw = localStorage.getItem(STYLE_KEY);
+      if(!raw){ alert("❌ Сохранений НЕТ"); return; }
+      try {
+        var obj = JSON.parse(raw);
+        alert("💾 Сохранено: " + Object.keys(obj).length + " записей");
+      } catch(e){ alert("Ошибка: " + e.message); }
+    };
+    document.getElementById("__dt_reapply").onclick = function(){
+      var r = applySavedStyles();
+      alert("✅ Применено: " + r.ok + "\n❌ Не найдено: " + r.fail);
+    };
+    document.getElementById("__dt_clear_styles").onclick = function(){
+      if(confirm("Сбросить все сохранённые CSS-изменения?")){ clearAll(); location.reload(); }
+    };
   }
 
   function setTab(name){
