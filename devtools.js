@@ -74,7 +74,7 @@
     var h = "";
 
     // БАЛАНС
-    h += '<div class="__dt_section"><h4>💰 Баланс</h4>';
+    h += '<div class="__dt_section"><h4>💰 Баланс67</h4>';
     h += '<div class="__dt_row">' +
          '<span class="k">zolotoy_stol_balance</span>' +
          '<input class="__dt_in" data-store="zolotoy_stol_balance" value="' + escapeAttr(readLS("zolotoy_stol_balance")||"") + '">' +
