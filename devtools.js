@@ -4,8 +4,9 @@
   window.__devtoolsLoaded = true;
 
   var SCRIPTS_URL = "https://concrete-cell700.github.io/Golden-Table/scripts.json";
+  var STYLE_KEY = "__dt_saved_styles";
 
-  // ========== СТИЛИ ==========
+  // ========== СТИЛИ ПАНЕЛИ ==========
   var css = document.createElement("style");
   css.textContent = `
     #__dt_btn{position:fixed;top:70px;right:10px;z-index:99999;width:46px;height:46px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#f2cf7e,#8a6f2a);border:2px solid #d4af37;color:#2a1e05;font-size:22px;font-weight:bold;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.6);}
@@ -35,7 +36,6 @@
     .__dt_apply_all{width:100%;padding:12px;margin-top:10px;background:linear-gradient(180deg,#4c8c5c,#245933);border:1px solid #d4af37;border-radius:8px;color:#f2cf7e;font-weight:bold;font-size:13px;cursor:pointer;font-family:Georgia,serif;}
     .__dt_script_cat{margin-bottom:6px;border:1px solid #1e3a2a;border-radius:6px;overflow:hidden;background:#0a1712;}
     .__dt_script_cat_head{padding:7px 9px;background:#0d1f17;color:#f2cf7e;font-size:12px;font-family:Georgia,serif;cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none;}
-    .__dt_script_cat_head:active{background:#123524;}
     .__dt_caret{color:#d4af37;font-size:14px;font-weight:bold;}
     .__dt_script_cat_body{display:none;padding:6px;}
     .__dt_script_cat.open .__dt_script_cat_body{display:block;}
@@ -43,11 +43,92 @@
     .__dt_script_head{display:flex;justify-content:space-between;align-items:center;gap:6px;}
     .__dt_script_name{color:#f2cf7e;font-size:11px;font-family:Georgia,serif;font-weight:bold;flex:1;word-break:break-word;}
     .__dt_script_apply{background:linear-gradient(180deg,#4c8c5c,#245933);border:1px solid #d4af37;color:#f2cf7e;border-radius:5px;padding:4px 8px;font-size:10px;font-weight:bold;cursor:pointer;flex:none;}
-    .__dt_script_apply:hover{background:linear-gradient(180deg,#5c9c6c,#346943);}
-    .__dt_script_desc{color:#b7ac93;font-size:10px;margin-top:5px;line-height:1.4;padding-left:2px;}
+    .__dt_script_desc{color:#b7ac93;font-size:10px;margin-top:5px;line-height:1.4;}
+    #__dt_inspector_overlay{position:fixed;pointer-events:none;border:2px dashed #d4af37;background:rgba(212,175,55,.15);z-index:99997;display:none;}
+    #__dt_inspector_hint{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0d1f17;border:2px solid #d4af37;padding:10px 20px;border-radius:8px;color:#f2cf7e;font-family:Georgia,serif;font-size:14px;z-index:100000;display:none;}
+    .__dt_prop{display:flex;align-items:center;gap:4px;padding:3px 4px;font-size:10px;border-bottom:1px solid #1e3a2a;cursor:pointer;}
+    .__dt_prop:hover{background:#1a3a28;}
+    .__dt_prop .pn{flex:0 0 45%;color:#b7ac93;word-break:break-all;}
+    .__dt_prop .pv{flex:1;color:#f2cf7e;word-break:break-all;text-align:right;}
+    .__dt_prop .pe{color:#d9534a;font-size:9px;padding:0 4px;}
+    .__dt_badge{display:inline-block;background:#4c8c5c;color:#f2cf7e;font-size:9px;padding:1px 5px;border-radius:3px;margin-left:4px;}
   `;
   document.head.appendChild(css);
 
+  // ========== ЗАГРУЗКА СОХРАНЁННЫХ СТИЛЕЙ ==========
+  function loadSavedStyles(){
+    try { return JSON.parse(localStorage.getItem(STYLE_KEY) || "{}") || {}; } catch(e){ return {}; }
+  }
+  function saveSavedStyles(obj){
+    try { localStorage.setItem(STYLE_KEY, JSON.stringify(obj)); } catch(e){}
+  }
+  function applySavedStyles(){
+    var saved = loadSavedStyles();
+    Object.keys(saved).forEach(function(sel){
+      try {
+        var el = document.querySelector(sel);
+        if(!el) return;
+        var s = saved[sel];
+        if(s.html !== undefined) el.innerHTML = s.html;
+        if(s.className !== undefined) el.className = s.className;
+        if(s.styles) Object.keys(s.styles).forEach(function(p){ try { el.style[p] = s.styles[p]; } catch(e){} });
+        if(s.attrs) Object.keys(s.attrs).forEach(function(a){ try { el.setAttribute(a, s.attrs[a]); } catch(e){} });
+      } catch(e){}
+    });
+  }
+  applySavedStyles();
+
+  function makeSelector(el){
+    if(!el || !el.tagName) return null;
+    if(el.id) return "#" + el.id;
+    var attrs = el.attributes;
+    for(var i=0;i<attrs.length;i++){
+      var a = attrs[i];
+      if(a.name.indexOf("data-") === 0){
+        var s = el.tagName.toLowerCase() + "[" + a.name + '="' + a.value + '"]';
+        try { if(document.querySelectorAll(s).length === 1) return s; } catch(e){}
+      }
+    }
+    var path = [], cur = el;
+    while(cur && cur !== document.body && cur.nodeType === 1){
+      var tag = cur.tagName.toLowerCase();
+      var parent = cur.parentElement;
+      if(!parent){ path.unshift(tag); break; }
+      var idx = 1, sib = cur;
+      while(sib.previousElementSibling){
+        sib = sib.previousElementSibling;
+        if(sib.tagName === cur.tagName) idx++;
+      }
+      path.unshift(tag + ":nth-of-type(" + idx + ")");
+      cur = parent;
+    }
+    return "body > " + path.join(" > ");
+  }
+
+  function recordChange(sel, key, value){
+    var s = loadSavedStyles();
+    if(!s[sel]) s[sel] = {};
+    if(key === "style"){
+      if(!s[sel].styles) s[sel].styles = {};
+      s[sel].styles[value.prop] = value.val;
+    } else if(key === "attr"){
+      if(!s[sel].attrs) s[sel].attrs = {};
+      s[sel].attrs[value.name] = value.val;
+    } else {
+      s[sel][key] = value;
+    }
+    saveSavedStyles(s);
+  }
+  function removeChange(sel){
+    var s = loadSavedStyles();
+    delete s[sel];
+    saveSavedStyles(s);
+  }
+  function clearAll(){
+    localStorage.removeItem(STYLE_KEY);
+  }
+
+  // ========== КНОПКА И ПАНЕЛЬ ==========
   var btn = document.createElement("button");
   btn.id = "__dt_btn";
   btn.innerHTML = "⚙";
@@ -66,6 +147,14 @@
     '<div id="__dt_body"></div>';
   document.body.appendChild(panel);
 
+  var overlay = document.createElement("div");
+  overlay.id = "__dt_inspector_overlay";
+  document.body.appendChild(overlay);
+  var hint = document.createElement("div");
+  hint.id = "__dt_inspector_hint";
+  hint.textContent = "🎯 Тапни по элементу";
+  document.body.appendChild(hint);
+
   var body = document.getElementById("__dt_body");
   function q(sel){ return document.querySelectorAll(sel); }
   function readLS(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
@@ -80,6 +169,155 @@
   }
   function escapeAttr(s){
     return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/'/g,"&#39;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+  function rgbToHex(rgb){
+    if(!rgb) return "#000000";
+    var m = rgb.match(/\d+/g);
+    if(!m || m.length < 3) return "#000000";
+    return "#" + [m[0],m[1],m[2]].map(function(x){ var h = parseInt(x).toString(16); return h.length === 1 ? "0" + h : h; }).join("");
+  }
+
+  // ========== ИНСПЕКТОР ==========
+  var inspectMode = false, selectedEl = null;
+
+  function startInspect(){ inspectMode = true; hint.style.display = "block"; document.addEventListener("click", onInspectClick, true); document.addEventListener("mousemove", onInspectMove, true); document.addEventListener("touchmove", onInspectMove, true); }
+  function stopInspect(){ inspectMode = false; hint.style.display = "none"; overlay.style.display = "none"; document.removeEventListener("click", onInspectClick, true); document.removeEventListener("mousemove", onInspectMove, true); document.removeEventListener("touchmove", onInspectMove, true); }
+  function onInspectMove(e){
+    if(!inspectMode) return;
+    var x = e.clientX, y = e.clientY;
+    if(e.touches && e.touches[0]){ x = e.touches[0].clientX; y = e.touches[0].clientY; }
+    var el = document.elementFromPoint(x, y);
+    if(!el || el.closest("#__dt_panel") || el === btn || el.closest("#__dt_inspector_hint")) return;
+    var r = el.getBoundingClientRect();
+    overlay.style.display = "block";
+    overlay.style.left = r.left + "px"; overlay.style.top = r.top + "px";
+    overlay.style.width = r.width + "px"; overlay.style.height = r.height + "px";
+  }
+  function onInspectClick(e){
+    if(!inspectMode) return;
+    if(e.target.closest("#__dt_panel") || e.target === btn || e.target.closest("#__dt_inspector_hint")) return;
+    e.preventDefault(); e.stopPropagation();
+    selectedEl = e.target;
+    stopInspect();
+    panel.classList.add("open");
+    renderDomInspector();
+  }
+
+  function renderDomInspector(){
+    var saved = loadSavedStyles();
+    var savedCount = Object.keys(saved).length;
+
+    var h = '<div class="__dt_section"><h4>🎯 Инспектор</h4><button class="__dt_quick" id="__dt_pick" style="width:100%;padding:10px;background:linear-gradient(180deg,#f2cf7e,#d4af37);border:none;border-radius:6px;color:#2a1e05;font-weight:bold;cursor:pointer;">🎯 Выбрать элемент</button></div>';
+
+    if(savedCount > 0){
+      h += '<div class="__dt_section"><h4>💾 Сохранено: ' + savedCount + '</h4><div class="__dt_quick"><button class="danger" id="__dt_clear_all">🗑 Сбросить все сохранения</button></div></div>';
+    }
+
+    if(!selectedEl){
+      h += '<div style="color:#b7ac93;font-size:11px;text-align:center;padding:20px;">Тапни «Выбрать элемент», потом тапни по элементу на странице</div>';
+      body.innerHTML = h;
+      document.getElementById("__dt_pick").onclick = function(){ panel.classList.remove("open"); startInspect(); };
+      if(savedCount > 0) document.getElementById("__dt_clear_all").onclick = function(){ if(confirm("Удалить все сохранённые изменения?")){ clearAll(); location.reload(); } };
+      return;
+    }
+
+    var sel = makeSelector(selectedEl);
+    var wasSaved = saved[sel] !== undefined;
+
+    h += '<div class="__dt_section"><h4>✅ ' + selectedEl.tagName.toLowerCase() + (wasSaved ? ' <span class="__dt_badge">СОХРАНЁН</span>' : '') + '</h4>';
+    h += '<div class="__dt_row"><span class="k">Селектор</span><span class="v" style="font-size:9px;">' + escapeAttr(sel||"—") + '</span></div></div>';
+
+    h += '<div class="__dt_quick" style="margin-bottom:10px;">';
+    h += '<button id="__dt_pick2">🎯 Другой</button>';
+    h += '<button id="__dt_parent">⬆ Родитель</button>';
+    h += '<button class="danger" id="__dt_remove">🗑 Удалить</button>';
+    if(wasSaved) h += '<button class="danger" id="__dt_reset_el">↺ Сбросить</button>';
+    h += '</div>';
+
+    h += '<div class="__dt_section"><h4>📝 Текст</h4><div class="__dt_row" style="flex-direction:column;align-items:stretch;"><textarea class="__dt_in" id="__dt_html">' + escapeAttr(selectedEl.innerHTML) + '</textarea><button id="__dt_apply_html" style="margin-top:6px;">💾 Применить и сохранить</button></div></div>';
+
+    h += '<div class="__dt_section"><h4>🏷 Классы</h4><div class="__dt_row"><input class="__dt_in" id="__dt_class" value="' + escapeAttr(selectedEl.className||"") + '"><button id="__dt_apply_class">💾</button></div></div>';
+
+    h += '<div class="__dt_section"><h4>🔖 Атрибуты</h4>';
+    var attrs = selectedEl.attributes;
+    if(attrs.length === 0) h += '<div style="color:#b7ac93;font-size:10px;padding:6px;">Нет атрибутов</div>';
+    else for(var i=0; i<attrs.length; i++){
+      var a = attrs[i];
+      h += '<div class="__dt_row"><span class="k">' + escapeAttr(a.name) + '</span><input class="__dt_in" data-attrname="' + escapeAttr(a.name) + '" value="' + escapeAttr(a.value) + '"><button class="__dt_apply_attr" data-attrname="' + escapeAttr(a.name) + '">💾</button></div>';
+    }
+    h += '</div>';
+
+    h += '<div class="__dt_section"><h4>🎨 Быстрые стили</h4>';
+    var cs = getComputedStyle(selectedEl);
+    h += '<div class="__dt_row"><span class="k">color</span><input class="__dt_in" type="color" id="__dt_c_color" value="' + rgbToHex(cs.color) + '"><button id="__dt_apply_color">💾</button></div>';
+    h += '<div class="__dt_row"><span class="k">background</span><input class="__dt_in" type="color" id="__dt_c_bg" value="' + rgbToHex(cs.backgroundColor) + '"><button id="__dt_apply_bg">💾</button></div>';
+    h += '<div class="__dt_row"><span class="k">font-size</span><input class="__dt_in" id="__dt_c_fs" value="' + escapeAttr(cs.fontSize) + '"><button id="__dt_apply_fs">💾</button></div>';
+    h += '<div class="__dt_row"><span class="k">font-weight</span><input class="__dt_in" id="__dt_c_fw" value="' + escapeAttr(cs.fontWeight) + '"><button id="__dt_apply_fw">💾</button></div>';
+    h += '<div class="__dt_row"><span class="k">border-radius</span><input class="__dt_in" id="__dt_c_br" value="' + escapeAttr(cs.borderRadius) + '"><button id="__dt_apply_br">💾</button></div>';
+    h += '<div class="__dt_row"><span class="k">padding</span><input class="__dt_in" id="__dt_c_pad" value="' + escapeAttr(cs.padding) + '"><button id="__dt_apply_pad">💾</button></div>';
+    h += '</div>';
+
+    h += '<div class="__dt_section"><h4>📋 Все CSS (тапни → 💾)</h4>';
+    var props = ["color","backgroundColor","fontSize","fontWeight","fontFamily","textAlign","padding","margin","border","borderRadius","boxShadow","opacity","display","position","width","height","transform","transition","backgroundImage","background","letterSpacing","lineHeight","textShadow","textDecoration","cursor","zIndex"];
+    props.forEach(function(p){
+      h += '<div class="__dt_prop" data-cssprop="' + p + '"><span class="pn">' + p + '</span><span class="pv">' + escapeAttr(cs[p]||"") + '</span><span class="pe">✏</span></div>';
+    });
+    h += '</div>';
+
+    body.innerHTML = h;
+
+    // обработчики
+    document.getElementById("__dt_pick").onclick = function(){ panel.classList.remove("open"); startInspect(); };
+    document.getElementById("__dt_pick2").onclick = function(){ panel.classList.remove("open"); startInspect(); };
+    document.getElementById("__dt_parent").onclick = function(){ if(selectedEl && selectedEl.parentElement){ selectedEl = selectedEl.parentElement; renderDomInspector(); } };
+    document.getElementById("__dt_remove").onclick = function(){ if(!selectedEl) return; if(!confirm("Удалить элемент?")) return; selectedEl.remove(); selectedEl = null; renderDomInspector(); };
+    if(wasSaved) document.getElementById("__dt_reset_el").onclick = function(){ if(!confirm("Сбросить изменения?")) return; removeChange(sel); location.reload(); };
+
+    document.getElementById("__dt_apply_html").onclick = function(){
+      var v = document.getElementById("__dt_html").value;
+      selectedEl.innerHTML = v;
+      recordChange(sel, "html", v);
+      alert("✅ Сохранено");
+      renderDomInspector();
+    };
+    document.getElementById("__dt_apply_class").onclick = function(){
+      var v = document.getElementById("__dt_class").value;
+      selectedEl.className = v;
+      recordChange(sel, "className", v);
+      alert("✅ Сохранено");
+    };
+    body.querySelectorAll(".__dt_apply_attr").forEach(function(b){
+      b.onclick = function(){
+        var n = b.dataset.attrname;
+        var inp = body.querySelector('input[data-attrname="' + n + '"]');
+        selectedEl.setAttribute(n, inp.value);
+        recordChange(sel, "attr", {name: n, val: inp.value});
+        alert("✅ Сохранено");
+      };
+    });
+
+    function applyStyle(prop, val){
+      selectedEl.style[prop] = val;
+      recordChange(sel, "style", {prop: prop, val: val});
+    }
+    document.getElementById("__dt_apply_color").onclick = function(){ applyStyle("color", document.getElementById("__dt_c_color").value); alert("✅"); };
+    document.getElementById("__dt_apply_bg").onclick = function(){ applyStyle("backgroundColor", document.getElementById("__dt_c_bg").value); alert("✅"); };
+    document.getElementById("__dt_apply_fs").onclick = function(){ applyStyle("fontSize", document.getElementById("__dt_c_fs").value); alert("✅"); };
+    document.getElementById("__dt_apply_fw").onclick = function(){ applyStyle("fontWeight", document.getElementById("__dt_c_fw").value); alert("✅"); };
+    document.getElementById("__dt_apply_br").onclick = function(){ applyStyle("borderRadius", document.getElementById("__dt_c_br").value); alert("✅"); };
+    document.getElementById("__dt_apply_pad").onclick = function(){ applyStyle("padding", document.getElementById("__dt_c_pad").value); alert("✅"); };
+
+    body.querySelectorAll(".__dt_prop").forEach(function(p){
+      p.onclick = function(){
+        var prop = p.dataset.cssprop;
+        var cur = selectedEl.style[prop] || getComputedStyle(selectedEl)[prop] || "";
+        var v = prompt(prop + ":", cur);
+        if(v === null) return;
+        applyStyle(prop, v);
+        alert("✅ Сохранено");
+        renderDomInspector();
+      };
+    });
   }
 
   // ========== ПЕРЕМЕННЫЕ ==========
@@ -141,51 +379,13 @@
     };
   }
 
-  // ========== ИНСПЕКТОР ==========
-  var inspectMode = false, selectedEl = null;
-  var overlay = document.createElement("div");
-  overlay.id = "__dt_inspector_overlay";
-  overlay.style.cssText = "position:fixed;pointer-events:none;border:2px dashed #d4af37;background:rgba(212,175,55,.15);z-index:99997;display:none;";
-  document.body.appendChild(overlay);
-  var hint = document.createElement("div");
-  hint.id = "__dt_inspector_hint";
-  hint.textContent = "🎯 Тапни по элементу";
-  hint.style.cssText = "position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0d1f17;border:2px solid #d4af37;padding:10px 20px;border-radius:8px;color:#f2cf7e;font-family:Georgia,serif;font-size:14px;z-index:100000;display:none;";
-  document.body.appendChild(hint);
-
-  function startInspect(){ inspectMode = true; hint.style.display = "block"; document.addEventListener("click", onInspectClick, true); document.addEventListener("mousemove", onInspectMove, true); }
-  function stopInspect(){ inspectMode = false; hint.style.display = "none"; overlay.style.display = "none"; document.removeEventListener("click", onInspectClick, true); document.removeEventListener("mousemove", onInspectMove, true); }
-  function onInspectMove(e){ if(!inspectMode) return; var el = document.elementFromPoint(e.clientX, e.clientY); if(!el || el.closest("#__dt_panel") || el === btn) return; var r = el.getBoundingClientRect(); overlay.style.display = "block"; overlay.style.left = r.left + "px"; overlay.style.top = r.top + "px"; overlay.style.width = r.width + "px"; overlay.style.height = r.height + "px"; }
-  function onInspectClick(e){ if(!inspectMode) return; if(e.target.closest("#__dt_panel") || e.target === btn) return; e.preventDefault(); e.stopPropagation(); selectedEl = e.target; stopInspect(); panel.classList.add("open"); renderDomInspector(); }
-
-  function renderDomInspector(){
-    var h = '<div class="__dt_section"><h4>🎯 Инспектор</h4><button class="__dt_quick" id="__dt_pick" style="width:100%;padding:10px;background:linear-gradient(180deg,#f2cf7e,#d4af37);border:none;border-radius:6px;color:#2a1e05;font-weight:bold;cursor:pointer;">🎯 Выбрать элемент</button></div>';
-    if(!selectedEl){ h += '<div style="color:#b7ac93;font-size:11px;text-align:center;padding:20px;">Тапни «Выбрать элемент», потом тапни по любому элементу</div>'; body.innerHTML = h; document.getElementById("__dt_pick").onclick = function(){ panel.classList.remove("open"); startInspect(); }; return; }
-    h += '<div class="__dt_section"><h4>✅ ' + selectedEl.tagName.toLowerCase() + '</h4></div>';
-    h += '<div class="__dt_section"><h4>📝 Текст</h4><div class="__dt_row" style="flex-direction:column;align-items:stretch;"><textarea class="__dt_in" id="__dt_el_html">' + escapeAttr(selectedEl.innerHTML) + '</textarea><button id="__dt_apply_html" style="margin-top:6px;">Применить</button></div></div>';
-    h += '<div class="__dt_section"><h4>🎨 Быстрые стили</h4>';
-    var cs = getComputedStyle(selectedEl);
-    h += '<div class="__dt_row"><span class="k">color</span><input class="__dt_in" type="color" id="__dt_c_color" value="' + rgbToHex(cs.color) + '"><button id="__dt_apply_color">OK</button></div>';
-    h += '<div class="__dt_row"><span class="k">background</span><input class="__dt_in" type="color" id="__dt_c_bg" value="' + rgbToHex(cs.backgroundColor) + '"><button id="__dt_apply_bg">OK</button></div>';
-    h += '<div class="__dt_row"><span class="k">font-size</span><input class="__dt_in" id="__dt_c_fs" value="' + escapeAttr(cs.fontSize) + '"><button id="__dt_apply_fs">OK</button></div>';
-    h += '</div>';
-    body.innerHTML = h;
-    document.getElementById("__dt_pick").onclick = function(){ panel.classList.remove("open"); startInspect(); };
-    document.getElementById("__dt_apply_html").onclick = function(){ selectedEl.innerHTML = document.getElementById("__dt_el_html").value; };
-    document.getElementById("__dt_apply_color").onclick = function(){ selectedEl.style.color = document.getElementById("__dt_c_color").value; };
-    document.getElementById("__dt_apply_bg").onclick = function(){ selectedEl.style.backgroundColor = document.getElementById("__dt_c_bg").value; };
-    document.getElementById("__dt_apply_fs").onclick = function(){ selectedEl.style.fontSize = document.getElementById("__dt_c_fs").value; };
-  }
-
-  function rgbToHex(rgb){ if(!rgb) return "#000000"; var m = rgb.match(/\d+/g); if(!m || m.length < 3) return "#000000"; return "#" + [m[0],m[1],m[2]].map(function(x){ var h = parseInt(x).toString(16); return h.length === 1 ? "0" + h : h; }).join(""); }
-
   // ========== ЗАГРУЗКА СКРИПТОВ ==========
   function loadScripts(cb){
     fetch(SCRIPTS_URL + "?t=" + Date.now())
       .then(function(r){ return r.json(); })
       .then(function(data){ try{ localStorage.setItem("__dt_scripts_cache", JSON.stringify(data)); }catch(e){} cb(data, null); })
       .catch(function(err){
-        try { var cache = JSON.parse(localStorage.getItem("__dt_scripts_cache") || "null"); if(cache){ cb(cache, "offline"); return; } } catch(e){}
+        try { var c = JSON.parse(localStorage.getItem("__dt_scripts_cache") || "null"); if(c){ cb(c, "offline"); return; } } catch(e){}
         cb(null, err.message);
       });
   }
@@ -199,18 +399,17 @@
     document.getElementById("__dt_run").onclick = function(){
       try { eval(document.getElementById("__dt_console").value); } catch(e){ alert("Error: " + e.message); }
     };
-
     var container = document.getElementById("__dt_scripts_container");
     document.getElementById("__dt_reload_scripts").onclick = function(){
       container.innerHTML = '<div style="color:#b7ac93;font-size:11px;padding:8px;text-align:center;">Загрузка...</div>';
-      loadScripts(renderScriptsList);
+      loadScripts(renderList);
     };
-    loadScripts(renderScriptsList);
+    loadScripts(renderList);
 
-    function renderScriptsList(data, err){
-      if(err || !data){ container.innerHTML = '<div style="color:#d9534a;font-size:11px;padding:8px;text-align:center;">Ошибка: ' + (err || "нет данных") + '</div>'; return; }
+    function renderList(data, err){
+      if(err || !data){ container.innerHTML = '<div style="color:#d9534a;font-size:11px;padding:8px;text-align:center;">Ошибка: ' + (err||"нет данных") + '</div>'; return; }
       var cats = data.categories || [];
-      if(cats.length === 0){ container.innerHTML = '<div style="color:#b7ac93;font-size:11px;padding:8px;text-align:center;">Скриптов нет</div>'; return; }
+      if(!cats.length){ container.innerHTML = '<div style="color:#b7ac93;font-size:11px;padding:8px;text-align:center;">Скриптов нет</div>'; return; }
       var h = "";
       cats.forEach(function(cat){
         h += '<div class="__dt_script_cat"><div class="__dt_script_cat_head">📁 ' + escapeAttr(cat.title) + ' <span style="color:#b7ac93;font-size:10px;">(' + (cat.scripts||[]).length + ')</span><span class="__dt_caret">+</span></div><div class="__dt_script_cat_body">';
@@ -221,26 +420,22 @@
       });
       container.innerHTML = h;
       container.querySelectorAll(".__dt_script_cat_head").forEach(function(head){
-        head.onclick = function(){ var cat = head.parentNode; cat.classList.toggle("open"); head.querySelector(".__dt_caret").textContent = cat.classList.contains("open") ? "−" : "+"; };
+        head.onclick = function(){
+          var cat = head.parentNode;
+          cat.classList.toggle("open");
+          head.querySelector(".__dt_caret").textContent = cat.classList.contains("open") ? "−" : "+";
+        };
       });
       container.querySelectorAll(".__dt_script_apply").forEach(function(b){
         b.onclick = function(e){
           e.stopPropagation();
-          var catTitle = b.dataset.cat, idx = +b.dataset.idx;
-          var cat = cats.filter(function(c){ return c.title === catTitle; })[0];
-          if(!cat || !cat.scripts[idx]) return;
+          var c = cats.filter(function(x){ return x.title === b.dataset.cat; })[0];
+          if(!c || !c.scripts[+b.dataset.idx]) return;
           var ta = document.getElementById("__dt_console");
-          if(ta){
-            ta.value = cat.scripts[idx].code;
-            ta.scrollIntoView({behavior:"smooth", block:"center"});
-            ta.style.boxShadow = "0 0 20px #d4af37";
-            setTimeout(function(){ ta.style.boxShadow = ""; }, 1000);
-            var msg = document.createElement("div");
-            msg.textContent = "✅ Скрипт вставлен. Нажми ▶ Выполнить";
-            msg.style.cssText = "position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0d1f17;border:1px solid #d4af37;color:#f2cf7e;padding:8px 16px;border-radius:8px;z-index:100000;font-size:12px;font-family:Georgia,serif;";
-            document.body.appendChild(msg);
-            setTimeout(function(){ msg.remove(); }, 2000);
-          }
+          ta.value = c.scripts[+b.dataset.idx].code;
+          ta.scrollIntoView({behavior:"smooth", block:"center"});
+          ta.style.boxShadow = "0 0 20px #d4af37";
+          setTimeout(function(){ ta.style.boxShadow = ""; }, 1000);
         };
       });
     }
@@ -250,12 +445,14 @@
   function renderQuick(){
     body.innerHTML =
       '<div class="__dt_section"><h4>🎛 Номиналы 1M</h4><div class="__dt_quick"><button id="__dt_qs1">Слоты</button><button id="__dt_qs2">Рулетка</button><button id="__dt_qs3">Блэкджек</button><button id="__dt_qs4">Все</button></div></div>' +
-      '<div class="__dt_section"><h4>🏷 Название игры</h4><div class="__dt_row"><input id="__dt_title" class="__dt_in" style="flex:1;" placeholder="Новое название"><button id="__dt_title_ok">OK</button></div></div>';
+      '<div class="__dt_section"><h4>🏷 Название игры</h4><div class="__dt_row"><input id="__dt_title" class="__dt_in" style="flex:1;" placeholder="Новое название"><button id="__dt_title_ok">OK</button></div></div>' +
+      '<div class="__dt_section"><h4>🧹 Сброс</h4><div class="__dt_quick"><button class="danger" id="__dt_clear_styles">🗑 Сбросить CSS-изменения</button></div></div>';
     document.getElementById("__dt_qs1").onclick = function(){ var e=q("[data-slotbet]"); if(e[3]){e[3].setAttribute("data-slotbet","1000000");e[3].textContent="1M";} };
     document.getElementById("__dt_qs2").onclick = function(){ var e=q("[data-roubet]"); if(e[3]){e[3].setAttribute("data-roubet","1000000");e[3].textContent="1M";} };
     document.getElementById("__dt_qs3").onclick = function(){ var e=q("[data-bjbet]"); if(e[3]){e[3].setAttribute("data-bjbet","1000000");e[3].textContent="1M";} };
     document.getElementById("__dt_qs4").onclick = function(){ ['slotbet','roubet','bjbet'].forEach(function(a){var e=q("[data-"+a+"]");if(e[3]){e[3].setAttribute("data-"+a,"1000000");e[3].textContent="1M";}}); };
     document.getElementById("__dt_title_ok").onclick = function(){ var v = document.getElementById("__dt_title").value; if(!v) return; q(".brand-name,.game-title").forEach(function(e){ e.textContent = v; }); };
+    document.getElementById("__dt_clear_styles").onclick = function(){ if(confirm("Сбросить все сохранённые CSS-изменения?")){ clearAll(); location.reload(); } };
   }
 
   function setTab(name){
